@@ -8,7 +8,7 @@ namespace EXRCore.EcsFramework {
 	public class EcsWorld {
 		public static EcsWorld Current { get; private set; }
 		
-		private readonly Dictionary<GameObject, Entity> spawnedEntitiesByObject = new();
+		private readonly Dictionary<GameObject, IEntity> spawnedEntitiesByObject = new();
 		private static Dictionary<Type, EntityConfig> configsMap;
 		
 		private EcsWorld() { }
@@ -32,15 +32,6 @@ namespace EXRCore.EcsFramework {
 		}
 		
 		
-		public Entity CreateEntity(GameObject owner, EcsComponentsProvider components = null, EcsSystemsProvider systems = null) {
-			var entity = new Entity(owner, components, systems);
-			if (spawnedEntitiesByObject.ContainsKey(owner)) {
-				throw new NullReferenceException($"Entity for game object {owner} already exists!");
-			}
-			
-			spawnedEntitiesByObject[owner] = entity;
-			return entity;
-		}
 		
 		public void RegisterComponent<TComponent, TConfig>(TComponent component) 
 			where TComponent: IPersistentComponent 
@@ -89,7 +80,17 @@ namespace EXRCore.EcsFramework {
 			config = founded;
 			return true;
 		}
-
+		
+		public Entity CreateEntity(GameObject owner, EcsComponentsProvider components = null, EcsSystemsProvider systems = null) {
+			var entity = new Entity(owner, components, systems);
+			if (spawnedEntitiesByObject.ContainsKey(owner)) { 
+				throw new NullReferenceException($"Entity for game object {owner} already exists!");
+			}
+        			
+			spawnedEntitiesByObject[owner] = entity;
+			return entity;
+		}
+		
 		public Entity CreateEntity<T>(Vector3 position, Quaternion rotation, Transform parent = null) where T: EntityConfig {
 			var key = typeof(T);
 			if (!configsMap.TryGetValue(key, out var config)) {
@@ -100,7 +101,7 @@ namespace EXRCore.EcsFramework {
 			return CreateEntity(owner, config.Components, config.Systems);
 		}
 		
-		public bool TryGetEntity(GameObject other, out Entity entity) => spawnedEntitiesByObject.TryGetValue(other, out entity);
+		public bool TryGetEntity(GameObject other, out IEntity entity) => spawnedEntitiesByObject.TryGetValue(other, out entity);
 
 		public void Update() {
 			foreach (var entity in spawnedEntitiesByObject.Values) {
@@ -128,8 +129,9 @@ namespace EXRCore.EcsFramework {
 			Destroy(entity);
 		}
 		
-		public void Destroy(Entity entity) {
+		public void Destroy(IEntity entity) {
 			entity.OnDestroy();
+			spawnedEntitiesByObject.Remove(entity.Owner);
 			Object.Destroy(entity.Owner);
 		}
 		
