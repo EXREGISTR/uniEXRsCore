@@ -98,7 +98,8 @@ namespace EXRCore.EcsFramework {
 			}
 			
 			GameObject owner = Object.Instantiate(config.Prefab, position, rotation, parent);
-			return CreateEntity(owner, config.Components, config.Systems);
+			var providers = config.CreateProviders();
+			return CreateEntity(owner, providers.components, providers.systems);
 		}
 		
 		public bool TryGetEntity(GameObject other, out IEntity entity) => spawnedEntitiesByObject.TryGetValue(other, out entity);

@@ -11,8 +11,10 @@ namespace EXRCore.EcsFramework {
 		protected virtual bool needToCopySystemsMap => true;
 		
 		[field: SerializeField] public GameObject Prefab { get; private set; }
-		public EcsComponentsProvider Components => new(components, needToCopyComponentsMap);
-		public EcsSystemsProvider Systems => new(systems, needToCopySystemsMap);
+		
+		public (EcsComponentsProvider components, EcsSystemsProvider systems) CreateProviders() {
+			return (new EcsComponentsProvider(components, needToCopyComponentsMap), new EcsSystemsProvider(systems, needToCopySystemsMap));
+		}
 		
 		public abstract void Initialize();
 		

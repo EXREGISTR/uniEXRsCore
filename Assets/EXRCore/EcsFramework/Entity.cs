@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using UnityEngine;
 
 namespace EXRCore.EcsFramework {
-	public sealed class Entity {
+	public sealed class Entity : IEntity {
 		private readonly EcsComponentsProvider persistentComponents;
 		private readonly EcsSystemsProvider systems;
 		
@@ -53,9 +53,9 @@ namespace EXRCore.EcsFramework {
 
 			return result;
 		}
-		
-		internal void FixedUpdate() => systems?.FixedUpdate();
-		internal void Update() => systems?.Update();
+
+		void IEntity.FixedUpdate() => systems?.FixedUpdate();
+		void IEntity.Update() => systems?.Update();
 
 		public bool ContainsPersistentComponent<T>() where T: IPersistentComponent {
 			return persistentComponents != null && persistentComponents.Contains<T>();
@@ -96,8 +96,8 @@ namespace EXRCore.EcsFramework {
 			list.RegisterCallback(onRemoveCallback);
 			onRemoveCallbacks[key] = list;
 		}
-		
-		internal void OnDestroy() {
+
+		void IEntity.OnDestroy() {
 			if (onAddCallbacks != null) {
 				foreach (var callbacksList in onAddCallbacks.Values) {
 					callbacksList.Clear();
