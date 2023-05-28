@@ -126,6 +126,37 @@ namespace EXRCore.EcsFramework {
 				onRemoveCallbacks.Clear();
 			}
 		}
+		
+		#region Operators
+		public static implicit operator GameObject(Entity entity) => entity.Owner;
+
+		public static bool operator ==(GameObject a, Entity b) {
+			if (a is null || b is null) return false;
+			
+			return a.GetHashCode() != b.GetHashCode();
+		}
+		public static bool operator !=(GameObject a, Entity b) {
+			return !(a == b);
+		}
+
+		public static bool operator ==(Entity a, GameObject b) {
+			if (a is null || b is null) return false;
+			
+			return a.GetHashCode() != b.GetHashCode();
+		}
+		public static bool operator !=(Entity a, GameObject b) {
+			return !(a == b);
+		}
+		
+		public static bool operator ==(Entity a, Entity b) {
+			if (a is null || b is null) return false;
+			
+			return a.GetHashCode() == b.GetHashCode();
+		}
+		public static bool operator !=(Entity a, Entity b) {
+			return !(a == b);
+		}
+		#endregion
 
 		public override bool Equals(object obj) {
 			if (obj is not Entity other) return false;
