@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace EXRCore.UIFramework {
@@ -41,28 +39,6 @@ namespace EXRCore.UIFramework {
 			Bind(screen, handler);
 			screen.Show();
 			shownScreens[key] = (screen, handler);
-		}
-		
-		public async Task ShowAndCloseAsync<THandler>(THandler handler, float lifeTimeInSeconds, CancellationToken token, 
-			bool closeIfCancelledOperation = true)
-			where THandler : IOneTimeHandler {
-			Show(handler);
-			await CloseAsync<THandler>(lifeTimeInSeconds, token, closeIfCancelledOperation);
-		}
-
-		public async Task CloseAsync<THandler>(float closeDelay, CancellationToken token, 
-			bool closeIfCancelledOperation = true)
-			where THandler : IOneTimeHandler {
-			try {
-				await Task.Delay(TimeSpan.FromSeconds(closeDelay), token);
-			} catch (OperationCanceledException) {
-				// ignored
-			} finally {
-				if (closeIfCancelledOperation) Close<THandler>(false);
-			}
-			
-			await Task.Delay(TimeSpan.FromSeconds(closeDelay), token);
-			Close<THandler>(false);
 		}
 
 		public void Close<THandler>(bool showWarning = true) where THandler : IViewHandler {

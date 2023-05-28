@@ -15,12 +15,14 @@ namespace EXRCore.EcsFramework {
 		public void EnableSystem<T>() where T : IEcsSystem;
 		public void DisableSystem<T>() where T : IEcsSystem;
 
-		public void RegisterHandler<T>([NotNull] Action<T> onAddCallback) where T : IDynamicComponent;
-		public void RegisterHandler<T>([NotNull] Action onRemoveCallback) where T : IDynamicComponent;
+		public void RegisterHandler<T>([NotNull] Action<T> onAddedCallback) where T : IDynamicComponent;
+		public void RegisterHandler<T>([NotNull] Action onRemovedCallback) where T : IDynamicComponent;
 
 		public bool ContainsPersistentComponent<T>() where T : IPersistentComponent;
 		public bool ContainsDynamicComponent<T>() where T : IDynamicComponent;
-
+		
 		internal void OnDestroy();
+		internal void OnEnable();
+		internal void OnDisable();
 	}
 }

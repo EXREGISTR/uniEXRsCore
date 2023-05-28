@@ -45,8 +45,15 @@
     <Analyzer Include="F:\Unity\2022.2.1f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\EXRCore\EcsFramework\IEntity.cs" />
+     <Compile Include="Assets\EXRCore\Attributes\ReadOnlyAttribute.cs" />
+     <Compile Include="Assets\EXRCore\Attributes\ReadOnlyDrawer.cs" />
+     <Compile Include="Assets\EXRCore\EcsFramework\EntityBuilder.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\System\IEcsSystem.cs" />
+     <Compile Include="Assets\EXRCore\Pools\IPoolObject.cs" />
+     <Compile Include="Assets\EXRCore\Pools\Pool.cs" />
+     <Compile Include="Assets\EXRCore\Pools\PoolProvider.cs" />
+     <Compile Include="Assets\EXRCore\Pools\PoolService.cs" />
+     <Compile Include="Assets\EXRCore\UIFramework\Extenssions.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Tools\ScreenContainer.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Screen\Screen.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Reactive\ProtectedReactiveProperty.cs" />
@@ -54,6 +61,7 @@
      <Compile Include="Assets\EXRCore\EcsFramework\Entity.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\ViewHandler\ViewHandler.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Extenssions.cs" />
+     <Compile Include="Assets\EXRCore\EcsFramework\IEntity.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\ViewHandler\IViewHandler.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\System\EcsSystem.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\EntityConfig.cs" />
@@ -62,7 +70,7 @@
      <Compile Include="Assets\EXRCore\EcsFramework\EcsWorld.cs" />
      <Compile Include="Assets\EXRCore\EventBus\IMessage.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Screen\IScreen.cs" />
-     <Compile Include="Assets\EXRCore\ServiceLocator\IService.cs" />
+     <Compile Include="Assets\EXRCore\Services\IService.cs" />
      <Compile Include="Assets\EXRCore\EventBus\IEventHandlersList.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Component\IPersistentComponent.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\ViewHandler\IOneTimeHandler.cs" />
@@ -79,8 +87,7 @@
      <Compile Include="Assets\EXRCore\UIFramework\UIService.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Providers\EcsSystemsProvider.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Component\IEntityComponent.cs" />
-     <Compile Include="Assets\EXRCore\ServiceLocator\ServiceLocator.cs" />
-     <Folder Include="Assets" />
+     <Compile Include="Assets\EXRCore\Services\ServiceLocator.cs" />
      <Folder Include="Assets\EXRCore\UIFramework\Screen" />
      <Folder Include="Assets\EXRCore\UIFramework\Tools" />
      <Folder Include="Assets\EXRCore\EcsFramework\Component" />
@@ -89,13 +96,10 @@
      <Folder Include="Assets\EXRCore\UIFramework\ViewHandler" />
      <Folder Include="Assets\EXRCore\EventBus" />
      <Folder Include="Assets\EXRCore\UIFramework\Reactive" />
-     <Folder Include="Assets\EXRCore" />
      <Folder Include="Assets\EXRCore\EcsFramework\Providers" />
-     <Folder Include="Assets\EXRCore\ServiceLocator" />
-     <Folder Include="Assets\EXRCore\EcsFramework\System" />
+     <Folder Include="Assets\EXRCore\Services" />
      <Folder Include="Assets\TutorialInfo\Scripts" />
      <Folder Include="Assets\TutorialInfo\Icons" />
-     <Folder Include="Assets\EXRCore\UIFramework" />
      <Folder Include="Assets\EXRCore\EcsFramework\Utils" />
      <Reference Include="UnityEngine">
      <HintPath>F:\Unity\2022.2.1f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>

@@ -6,10 +6,32 @@ namespace EXRCore.EcsFramework {
 	public class EcsSystemsProvider : EcsProvider<IEcsSystem> {
 		public EcsSystemsProvider(IDictionary<Type, IEcsSystem> systems, bool needToCopy = true) : base(systems, needToCopy) { }
 		
-		public void Initialize(Entity context, [CanBeNull] EcsProvider<IPersistentComponent> components) {
+		public void Initialize(Entity context, [CanBeNull] EcsProvider<IPersistentComponent> components, bool enableSystemsNow) {
+			Action<IEcsSystem> action;
+			if (enableSystemsNow) {
+				action = system => {
+					system.Initialize(context, components);
+					system.Enable();
+				};
+			}
+			else {
+				action = system => system.Initialize(context, components);
+			}
+
 			foreach (var system in subjects.Values) {
-				system.Initialize(context, components);
+				action(system);
+			}
+		}
+		
+		public void EnableAll() {
+			foreach (var system in subjects.Values) {
 				system.Enable();
+			}
+		}
+
+		public void DisableAll() {
+			foreach (var system in subjects.Values) {
+				system.Disable();
 			}
 		}
 

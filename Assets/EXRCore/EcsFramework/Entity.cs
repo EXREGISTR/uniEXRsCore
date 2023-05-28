@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EXRCore.Pools;
 using JetBrains.Annotations;
 using UnityEngine;
 
 namespace EXRCore.EcsFramework {
-	public sealed class Entity : IEntity {
+	public sealed class Entity : IEntity, IPoolObject {
 		private readonly EcsComponentsProvider persistentComponents;
 		private readonly EcsSystemsProvider systems;
 		
@@ -12,17 +13,21 @@ namespace EXRCore.EcsFramework {
 		private IDictionary<Type, ICallbacksWrapper> onAddCallbacks;
 		private IDictionary<Type, ICallbacksWrapper> onRemoveCallbacks;
 		public GameObject Owner { get; }
-		
+		public Transform Transform => Owner.transform;
+		public Vector3 Position => Transform.position;
+		public Quaternion Rotation => Transform.rotation;
+
 		public Entity(
 			GameObject owner,
 			[CanBeNull] EcsComponentsProvider persistentComponents,
-			[CanBeNull] EcsSystemsProvider systems) {
-
+			[CanBeNull] EcsSystemsProvider systems,
+			bool enableSystemsNow) {
+			
 			this.persistentComponents = persistentComponents;
 			this.systems = systems;
 			this.Owner = owner;
-
-			systems?.Initialize(this, persistentComponents);
+			
+			systems?.Initialize(this, persistentComponents, enableSystemsNow);
 		}
 
 		public bool AddComponent<T>(T component) where T: IDynamicComponent {
@@ -68,35 +73,42 @@ namespace EXRCore.EcsFramework {
 		public void EnableSystem<T>() where T : IEcsSystem => systems.Enable<T>();
 		public void DisableSystem<T>() where T : IEcsSystem => systems.Disable<T>();
 		
-		public void RegisterHandler<T>([NotNull] Action<T> onAddCallback) where T : IDynamicComponent {
+		public void RegisterHandler<T>(Action<T> onAddedCallback) where T : IDynamicComponent {
 			var key = typeof(T);
 			onAddCallbacks ??= new Dictionary<Type, ICallbacksWrapper>();
 			if (!onAddCallbacks.TryGetValue(key, out var callbacks)) {
 				var list = new OnAddComponentCallbackList<T>();
-				list.RegisterCallback(onAddCallback);
+				list.RegisterCallback(onAddedCallback);
 				onAddCallbacks[key] = list;
 			} else {
-				((OnAddComponentCallbackList<T>)callbacks).RegisterCallback(onAddCallback);
+				((OnAddComponentCallbackList<T>)callbacks).RegisterCallback(onAddedCallback);
 			}
 			
 			if (dynamicComponents.TryGetValue(key, out var component)) {
-				onAddCallback((T)component);
+				onAddedCallback((T)component);
 			}
 		}
 		
-		public void RegisterHandler<T>([NotNull] Action onRemoveCallback) where T : IDynamicComponent {
+		public void RegisterHandler<T>(Action onRemovedCallback) where T : IDynamicComponent {
 			var key = typeof(T);
 			onRemoveCallbacks ??= new Dictionary<Type, ICallbacksWrapper>();
 			if (onRemoveCallbacks.TryGetValue(key, out var callbacks)) {
-				((OnRemovedComponentCallbackList)callbacks).RegisterCallback(onRemoveCallback);
+				((OnRemovedComponentCallbackList)callbacks).RegisterCallback(onRemovedCallback);
 				return;
 			}
 
 			var list = new OnRemovedComponentCallbackList();
-			list.RegisterCallback(onRemoveCallback);
+			list.RegisterCallback(onRemovedCallback);
 			onRemoveCallbacks[key] = list;
 		}
+		
+		void IEntity.OnEnable() => systems.EnableAll();
 
+		void IEntity.OnDisable() {
+			systems.DisableAll();
+			persistentComponents?.ResetAll();
+		}
+		
 		void IEntity.OnDestroy() {
 			if (onAddCallbacks != null) {
 				foreach (var callbacksList in onAddCallbacks.Values) {
@@ -113,8 +125,6 @@ namespace EXRCore.EcsFramework {
 
 				onRemoveCallbacks.Clear();
 			}
-			
-			persistentComponents?.ResetAll();
 		}
 
 		public override bool Equals(object obj) {

@@ -1,7 +1,7 @@
 ﻿namespace EXRCore.EcsFramework {
 	public abstract class EcsSystem : IEcsSystem {
 		protected Entity context { get; private set; }
-		private bool isActive;
+		protected bool isActive { get; private set; }
 		
 		void IEcsSystem.Initialize(Entity context, EcsProvider<IPersistentComponent> components) {
 			this.context = context;
@@ -21,12 +21,12 @@
 			isActive = false;
 			OnDisabled();
 		}
-
+		
 		void IEcsSystem.FixedUpdate() {
 			if (!isActive) return;
 			FixedUpdate();
 		}
-
+		
 		void IEcsSystem.Update() {
 			if (!isActive) return;
 			Update();
