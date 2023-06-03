@@ -19,7 +19,7 @@ namespace EXRCore.Pools {
 		
 		public T Get() => pool.TryDequeue(out T @object) ? @object : factory();
 		public void Return(T @object) {
-			resetter.Invoke(@object);
+			resetter(@object);
 			pool.Enqueue(@object);
 		}
 	}

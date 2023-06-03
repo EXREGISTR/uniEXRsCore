@@ -45,39 +45,38 @@
     <Analyzer Include="F:\Unity\2022.2.1f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\EXRCore\Attributes\ReadOnlyAttribute.cs" />
-     <Compile Include="Assets\EXRCore\Attributes\ReadOnlyDrawer.cs" />
-     <Compile Include="Assets\EXRCore\EcsFramework\EntityBuilder.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\System\IEcsSystem.cs" />
-     <Compile Include="Assets\EXRCore\Pools\IPoolObject.cs" />
-     <Compile Include="Assets\EXRCore\Pools\Pool.cs" />
-     <Compile Include="Assets\EXRCore\Pools\PoolProvider.cs" />
-     <Compile Include="Assets\EXRCore\Pools\PoolService.cs" />
-     <Compile Include="Assets\EXRCore\UIFramework\Extenssions.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Tools\ScreenContainer.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Screen\Screen.cs" />
-     <Compile Include="Assets\EXRCore\UIFramework\Reactive\ProtectedReactiveProperty.cs" />
+     <Compile Include="Assets\EXRCore\Services\IService.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Tools\InitializatorUI.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Entity.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\ViewHandler\ViewHandler.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Extenssions.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\IEntity.cs" />
+     <Compile Include="Assets\EXRCore\Attributes\ReadOnlyDrawer.cs" />
+     <Compile Include="Assets\EXRCore\Attributes\ReadOnlyAttribute.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\ViewHandler\IViewHandler.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\System\EcsSystem.cs" />
+     <Compile Include="Assets\EXRCore\EcsFramework\IEntityMessage.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\EntityConfig.cs" />
-     <Compile Include="Assets\EXRCore\UIFramework\Reactive\ReactiveProperty.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
+     <Compile Include="Assets\EXRCore\Pools\PoolProvider.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\EcsWorld.cs" />
      <Compile Include="Assets\EXRCore\EventBus\IMessage.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Screen\IScreen.cs" />
-     <Compile Include="Assets\EXRCore\Services\IService.cs" />
      <Compile Include="Assets\EXRCore\EventBus\IEventHandlersList.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Component\IPersistentComponent.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\ViewHandler\IOneTimeHandler.cs" />
+     <Compile Include="Assets\EXRCore\EcsFramework\EntityBuilder.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\IUIService.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Tools\IScreensContainer.cs" />
+     <Compile Include="Assets\EXRCore\UIFramework\Extenssions.cs" />
+     <Compile Include="Assets\EXRCore\Pools\IPoolObject.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\ViewHandler\IPersistentViewHandler.cs" />
      <Compile Include="Assets\EXRCore\EventBus\EventHandlersList.cs" />
+     <Compile Include="Assets\EXRCore\Pools\Pool.cs" />
+     <Compile Include="Assets\EXRCore\Pools\PoolService.cs" />
      <Compile Include="Assets\EXRCore\EventBus\EventBus.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\IEcsSubject.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Providers\EcsComponentsProvider.cs" />
@@ -88,6 +87,7 @@
      <Compile Include="Assets\EXRCore\EcsFramework\Providers\EcsSystemsProvider.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Component\IEntityComponent.cs" />
      <Compile Include="Assets\EXRCore\Services\ServiceLocator.cs" />
+     <Folder Include="Assets" />
      <Folder Include="Assets\EXRCore\UIFramework\Screen" />
      <Folder Include="Assets\EXRCore\UIFramework\Tools" />
      <Folder Include="Assets\EXRCore\EcsFramework\Component" />
@@ -95,11 +95,16 @@
      <Folder Include="Assets\TutorialInfo" />
      <Folder Include="Assets\EXRCore\UIFramework\ViewHandler" />
      <Folder Include="Assets\EXRCore\EventBus" />
-     <Folder Include="Assets\EXRCore\UIFramework\Reactive" />
+     <Folder Include="Assets\EXRCore\Attributes" />
+     <Folder Include="Assets\EXRCore\Pools" />
+     <Folder Include="Assets\EXRCore" />
+     <Folder Include="Assets\EXRCore\EcsFramework" />
      <Folder Include="Assets\EXRCore\EcsFramework\Providers" />
      <Folder Include="Assets\EXRCore\Services" />
+     <Folder Include="Assets\EXRCore\EcsFramework\System" />
      <Folder Include="Assets\TutorialInfo\Scripts" />
      <Folder Include="Assets\TutorialInfo\Icons" />
+     <Folder Include="Assets\EXRCore\UIFramework" />
      <Folder Include="Assets\EXRCore\EcsFramework\Utils" />
      <Reference Include="UnityEngine">
      <HintPath>F:\Unity\2022.2.1f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
@@ -355,6 +360,21 @@
      </Reference>
      <Reference Include="Newtonsoft.Json">
      <HintPath>F:\UnityProjects\IDontKnow\Library\PackageCache\com.unity.nuget.newtonsoft-json@3.0.2\Runtime\Newtonsoft.Json.dll</HintPath>
+     </Reference>
+     <Reference Include="Zenject.ReflectionBaking.Mono.Cecil.Rocks">
+     <HintPath>F:\UnityProjects\IDontKnow\Assets\Plugins\Zenject\OptionalExtras\ReflectionBaking\Lib\Zenject.ReflectionBaking.Mono.Cecil.Rocks.dll</HintPath>
+     </Reference>
+     <Reference Include="Zenject.ReflectionBaking.Mono.Cecil.Pdb">
+     <HintPath>F:\UnityProjects\IDontKnow\Assets\Plugins\Zenject\OptionalExtras\ReflectionBaking\Lib\Zenject.ReflectionBaking.Mono.Cecil.Pdb.dll</HintPath>
+     </Reference>
+     <Reference Include="Zenject-usage">
+     <HintPath>F:\UnityProjects\IDontKnow\Assets\Plugins\Zenject\Source\Usage\Zenject-usage.dll</HintPath>
+     </Reference>
+     <Reference Include="Zenject.ReflectionBaking.Mono.Cecil">
+     <HintPath>F:\UnityProjects\IDontKnow\Assets\Plugins\Zenject\OptionalExtras\ReflectionBaking\Lib\Zenject.ReflectionBaking.Mono.Cecil.dll</HintPath>
+     </Reference>
+     <Reference Include="Zenject.ReflectionBaking.Mono.Cecil.Mdb">
+     <HintPath>F:\UnityProjects\IDontKnow\Assets\Plugins\Zenject\OptionalExtras\ReflectionBaking\Lib\Zenject.ReflectionBaking.Mono.Cecil.Mdb.dll</HintPath>
      </Reference>
      <Reference Include="netstandard">
      <HintPath>F:\Unity\2022.2.1f1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>
@@ -737,14 +757,14 @@
      <Reference Include="Unity.VisualScripting.Shared.Editor">
      <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.VisualScripting.Shared.Editor.dll</HintPath>
      </Reference>
-     <Reference Include="Unity.Timeline.Editor">
-     <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
-     </Reference>
      <Reference Include="Unity.ScriptableBuildPipeline">
      <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.ScriptableBuildPipeline.dll</HintPath>
      </Reference>
      <Reference Include="Unity.AdaptivePerformance">
      <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.AdaptivePerformance.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.Timeline.Editor">
+     <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
      </Reference>
      <Reference Include="Unity.VisualStudio.Editor">
      <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
@@ -767,6 +787,9 @@
      <Reference Include="Unity.VisualScripting.Core.Editor">
      <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
      </Reference>
+     <Reference Include="UnityEditor.CacheServer">
+     <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\UnityEditor.CacheServer.dll</HintPath>
+     </Reference>
      <Reference Include="Unity.Rider.Editor">
      <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
      </Reference>
@@ -775,9 +798,6 @@
      </Reference>
      <Reference Include="UnityEngine.UI">
      <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
-     </Reference>
-     <Reference Include="UnityEditor.CacheServer">
-     <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\UnityEditor.CacheServer.dll</HintPath>
      </Reference>
      <Reference Include="Unity.Services.Core">
      <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.Services.Core.dll</HintPath>
@@ -824,17 +844,37 @@
      <Reference Include="Unity.Notifications.Android">
      <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.Notifications.Android.dll</HintPath>
      </Reference>
-     <Reference Include="Unity.VSCode.Editor">
-     <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
-     </Reference>
      <Reference Include="Unity.ScriptableBuildPipeline.Editor">
      <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.ScriptableBuildPipeline.Editor.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.VSCode.Editor">
+     <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
      </Reference>
      <Reference Include="Unity.Profiling.Core">
      <HintPath>F:\UnityProjects\IDontKnow\Library\ScriptAssemblies\Unity.Profiling.Core.dll</HintPath>
      </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Zenject-Editor.csproj">
+      <Project>{7fe8fd90-1bd3-7551-cc70-6a527575f752}</Project>
+      <Name>Zenject-Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Zenject-ReflectionBaking-Editor.csproj">
+      <Project>{05f7ee06-5190-3475-d8a5-fe41a8355b6c}</Project>
+      <Name>Zenject-ReflectionBaking-Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="UniRx.csproj">
+      <Project>{0c68c8f8-75d9-19f7-0555-0bafbfc8403d}</Project>
+      <Name>UniRx</Name>
+    </ProjectReference>
+    <ProjectReference Include="Zenject.csproj">
+      <Project>{4b43f081-aa66-6cd5-ee98-3003b4b096fc}</Project>
+      <Name>Zenject</Name>
+    </ProjectReference>
+    <ProjectReference Include="Zenject-PoolMonitor-Editor.csproj">
+      <Project>{870d0f9e-d104-8c0d-5131-e27b7182234b}</Project>
+      <Name>Zenject-PoolMonitor-Editor</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

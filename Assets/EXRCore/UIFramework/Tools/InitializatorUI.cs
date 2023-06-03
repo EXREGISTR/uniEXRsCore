@@ -3,10 +3,11 @@
 namespace EXRCore.UIFramework {
 	public abstract class InitializatorUI : MonoBehaviour {
 		[SerializeField] private ScreenContainer container;
-
-		private readonly IUIService service = new UIService();
+		
+		private UIService service;
 		
 		private void OnEnable() {
+			service = new UIService();
 			service.Initialize(container);
 			Initialize(service);
 		}

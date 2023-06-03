@@ -9,6 +9,8 @@
 		}
 		
 		protected abstract void Initialize(EcsProvider<IPersistentComponent> components);
+		
+		void IEcsSystem.OnDestroy() => OnDestroy();
 
 		public void Enable() {
 			if (isActive) return;
@@ -36,5 +38,6 @@
 		protected virtual void Update() { }
 		protected virtual void OnEnabled() { }
 		protected virtual void OnDisabled() { }
+		protected virtual void OnDestroy() { }
 	}
 }

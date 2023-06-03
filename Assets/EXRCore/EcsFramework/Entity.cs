@@ -10,8 +10,9 @@ namespace EXRCore.EcsFramework {
 		private readonly EcsSystemsProvider systems;
 		
 		private IDictionary<Type, IDynamicComponent> dynamicComponents;
-		private IDictionary<Type, ICallbacksWrapper> onAddCallbacks;
+		private IDictionary<Type, ICallbacksWrapper> onReceiveMessageCallbacks;
 		private IDictionary<Type, ICallbacksWrapper> onRemoveCallbacks;
+		
 		public GameObject Owner { get; }
 		public Transform Transform => Owner.transform;
 		public Vector3 Position => Transform.position;
@@ -29,67 +30,35 @@ namespace EXRCore.EcsFramework {
 			
 			systems?.Initialize(this, persistentComponents, enableSystemsNow);
 		}
-
-		public bool AddComponent<T>(T component) where T: IDynamicComponent {
-			var key = typeof(T);
-			if (dynamicComponents.ContainsKey(key)) return false;
-			dynamicComponents ??= new Dictionary<Type, IDynamicComponent>();
-			dynamicComponents[key] = component;
+		
+		public void SendMessage<T>(T message) where T : IEntityMessage {
+			if (onReceiveMessageCallbacks == null) return;
+			var messageType = typeof(T);
 			
-			if (onAddCallbacks != null) {
-				if (onAddCallbacks.TryGetValue(key, out var callbacks)) {
-					((OnAddComponentCallbackList<T>)callbacks).OnAddComponent(component);
-				}
+			if (onReceiveMessageCallbacks.TryGetValue(messageType, out var callbacks)) {
+				((OnReceivedMessagesCallbacks<T>)callbacks).Invoke(message);
 			}
-			
-			return true;
 		}
 		
-		public bool RemoveComponent<T>() where T : IDynamicComponent {
-			var key = typeof(T);
-			if (!dynamicComponents.ContainsKey(key)) return false;
-			
-			var result = dynamicComponents.Remove(key);
-			if (onRemoveCallbacks != null) {
-				if (onRemoveCallbacks.TryGetValue(key, out var callbacks)) {
-					((OnRemovedComponentCallbackList)callbacks).OnRemovedComponent();
-				}
-			}
-
-			return result;
-		}
-
-		void IEntity.FixedUpdate() => systems?.FixedUpdate();
-		void IEntity.Update() => systems?.Update();
-
-		public bool ContainsPersistentComponent<T>() where T: IPersistentComponent {
-			return persistentComponents != null && persistentComponents.Contains<T>();
-		}
-
-		public bool ContainsDynamicComponent<T>() where T: IDynamicComponent {
-			return dynamicComponents != null && dynamicComponents.ContainsKey(typeof(T));
-		}
-
 		public void EnableSystem<T>() where T : IEcsSystem => systems.Enable<T>();
 		public void DisableSystem<T>() where T : IEcsSystem => systems.Disable<T>();
 		
-		public void RegisterHandler<T>(Action<T> onAddedCallback) where T : IDynamicComponent {
+		public void RegisterHandler<T>(Action<T> onAddedCallback) where T : IEntityMessage {
 			var key = typeof(T);
-			onAddCallbacks ??= new Dictionary<Type, ICallbacksWrapper>();
-			if (!onAddCallbacks.TryGetValue(key, out var callbacks)) {
-				var list = new OnAddComponentCallbackList<T>();
+			onReceiveMessageCallbacks ??= new Dictionary<Type, ICallbacksWrapper>();
+			if (!onReceiveMessageCallbacks.TryGetValue(key, out var callbacks)) {
+				var list = new OnReceivedMessagesCallbacks<T>();
 				list.RegisterCallback(onAddedCallback);
-				onAddCallbacks[key] = list;
+				onReceiveMessageCallbacks[key] = list;
 			} else {
-				((OnAddComponentCallbackList<T>)callbacks).RegisterCallback(onAddedCallback);
+				((OnReceivedMessagesCallbacks<T>)callbacks).RegisterCallback(onAddedCallback);
 			}
 			
 			if (dynamicComponents.TryGetValue(key, out var component)) {
 				onAddedCallback((T)component);
 			}
 		}
-		
-		public void RegisterHandler<T>(Action onRemovedCallback) where T : IDynamicComponent {
+		public void RegisterHandler<T>(Action onRemovedCallback) where T : IEntityMessage {
 			var key = typeof(T);
 			onRemoveCallbacks ??= new Dictionary<Type, ICallbacksWrapper>();
 			if (onRemoveCallbacks.TryGetValue(key, out var callbacks)) {
@@ -102,20 +71,58 @@ namespace EXRCore.EcsFramework {
 			onRemoveCallbacks[key] = list;
 		}
 		
-		void IEntity.OnEnable() => systems.EnableAll();
-
-		void IEntity.OnDisable() {
-			systems.DisableAll();
-			persistentComponents?.ResetAll();
+		#region Components
+        public bool AddComponent<T>(T component) where T: IDynamicComponent {
+        	var key = typeof(T);
+        	if (dynamicComponents != null) {
+        	     if (dynamicComponents.ContainsKey(key)) return false;
+        	} else {
+        		dynamicComponents = new Dictionary<Type, IDynamicComponent>();
+        	}
+        	dynamicComponents[key] = component;
+        	SendMessage(component);
+        	return true;
+        }
+        		
+		public bool RemoveComponent<T>() where T : IDynamicComponent { 
+			var key = typeof(T);
+			if (dynamicComponents == null) return false;
+        
+			var result = dynamicComponents.Remove(key);
+			if (!result) return false;
+        			
+			if (onRemoveCallbacks != null) { 
+				if (onRemoveCallbacks.TryGetValue(key, out var callbacks)) {
+					((OnRemovedComponentCallbackList)callbacks).Invoke();
+				}
+			}
+			
+			return true;
 		}
+        
+		public bool ContainsPersistentComponent<T>() where T: IPersistentComponent {
+			return persistentComponents != null && persistentComponents.Contains<T>();
+        }
+        
+		public bool ContainsDynamicComponent<T>() where T: IDynamicComponent {
+			return dynamicComponents != null && dynamicComponents.ContainsKey(typeof(T));
+		}
+		#endregion
+                
+		#region Explicitly
+		void IEntity.OnEnable() => systems.EnableAll();
+		void IEntity.OnDisable() => systems.DisableAll();
+		void IEntity.FixedUpdate() => systems?.FixedUpdate();
+		void IEntity.Update() => systems?.Update();
 		
 		void IEntity.OnDestroy() {
-			if (onAddCallbacks != null) {
-				foreach (var callbacksList in onAddCallbacks.Values) {
+			systems.Dispose();
+			if (onReceiveMessageCallbacks != null) {
+				foreach (var callbacksList in onReceiveMessageCallbacks.Values) {
 					callbacksList.Clear();
 				}
 
-				onAddCallbacks.Clear();
+				onReceiveMessageCallbacks.Clear();
 			}
 
 			if (onRemoveCallbacks != null) {
@@ -126,6 +133,7 @@ namespace EXRCore.EcsFramework {
 				onRemoveCallbacks.Clear();
 			}
 		}
+		#endregion
 		
 		#region Operators
 		public static implicit operator GameObject(Entity entity) => entity.Owner;
@@ -157,7 +165,7 @@ namespace EXRCore.EcsFramework {
 			return !(a == b);
 		}
 		#endregion
-
+		
 		public override bool Equals(object obj) {
 			if (obj is not Entity other) return false;
 			return GetHashCode() == other.GetHashCode();

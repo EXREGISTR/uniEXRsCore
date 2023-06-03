@@ -1,5 +1,3 @@
 ﻿namespace EXRCore.EcsFramework {
-	public interface IPersistentComponent : IEntityComponent {
-		public void Reset();
-	}
+	public interface IPersistentComponent : IEntityComponent { }
 }

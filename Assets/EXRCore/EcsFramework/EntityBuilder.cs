@@ -10,12 +10,12 @@ namespace EXRCore.EcsFramework {
 		
 		private IDictionary<Type, IPersistentComponent> components;
 		private IDictionary<Type, IEcsSystem> systems;
-		
-		private EntityBuilder(GameObject prefab) => this.prefab = prefab;
 
+		public EntityBuilder(GameObject prefab) => this.prefab = prefab;
+		
 		public EntityBuilder AddComponent<T>(T component) where T : IPersistentComponent {
 			var key = typeof(T);
-
+			
 			components ??= new Dictionary<Type, IPersistentComponent>();
 			if (components.ContainsKey(key)) {
 				Debug.LogWarning($"Component {key} already registered in builder!");
@@ -34,15 +34,15 @@ namespace EXRCore.EcsFramework {
 				Debug.LogWarning($"System {key} already registered in builder!");
 				return this;
 			}
-
+			
 			systems[key] = system;
 			return this;
 		}
 		
 		public Entity Create(Vector3 position, Quaternion rotation, Transform parent = null) {
-			var componentsProvider = new EcsComponentsProvider(components, false);
-			var systemsProvider = new EcsSystemsProvider(systems, false);
-			
+			var componentsProvider = components != null ? new EcsComponentsProvider(components) : null;
+			var systemsProvider = systems != null ? new EcsSystemsProvider(systems) : null;
+
 			GameObject owner = Object.Instantiate(prefab, position, rotation, parent);
 			return Service<EcsWorld>.Instance.CreateEntity(owner, componentsProvider, systemsProvider);
 		}

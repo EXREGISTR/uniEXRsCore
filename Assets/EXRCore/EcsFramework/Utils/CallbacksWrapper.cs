@@ -7,12 +7,12 @@ namespace EXRCore.EcsFramework {
 		public void Clear();
 	}
 	
-	internal class OnAddComponentCallbackList<T> : ICallbacksWrapper where T: IDynamicComponent {
+	internal class OnReceivedMessagesCallbacks<T> : ICallbacksWrapper where T: IEntityMessage {
 		private Action<T> callbacks;
 
 		public void RegisterCallback(Action<T> callback) => callbacks += callback;
 		
-		public void OnAddComponent(T component) {
+		public void Invoke(T component) {
 			try {
 				callbacks.Invoke(component);
 			} catch (NullReferenceException) {
@@ -30,7 +30,7 @@ namespace EXRCore.EcsFramework {
 		private Action callbacks;
 
 		public void RegisterCallback(Action callback) => callbacks += callback;
-		public void OnRemovedComponent() {
+		public void Invoke() {
 			try {
 				callbacks.Invoke();
 			} catch (NullReferenceException) {

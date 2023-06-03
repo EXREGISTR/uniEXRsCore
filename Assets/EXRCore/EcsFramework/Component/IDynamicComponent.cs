@@ -1,3 +1,3 @@
 ﻿namespace EXRCore.EcsFramework {
-	public interface IDynamicComponent { }
+	public interface IDynamicComponent : IEntityComponent, IEntityMessage { }
 }

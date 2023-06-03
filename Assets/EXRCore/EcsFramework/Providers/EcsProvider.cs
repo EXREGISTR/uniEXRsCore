@@ -4,25 +4,36 @@ using UnityEngine;
 
 namespace EXRCore.EcsFramework {
 	public abstract class EcsProvider<TSubject> where TSubject: IEcsSubject {
-		protected readonly IDictionary<Type, TSubject> subjects;
+		private readonly IDictionary<Type, TSubject> subjectsMap;
 		
-		protected EcsProvider(IDictionary<Type, TSubject> subjects, bool needToCopy) {
-			if (!needToCopy) {
-				this.subjects = subjects;
-				return;
-			}
-			
-			this.subjects = new Dictionary<Type, TSubject>(subjects.Count);
+		protected EcsProvider(IReadOnlyDictionary<Type, Func<TSubject>> subjects) {
+			subjectsMap = new Dictionary<Type, TSubject>(subjects.Count);
 			foreach (var kvp in subjects) {
-				subjects[kvp.Key] = kvp.Value;
+				subjectsMap[kvp.Key] = kvp.Value.Invoke();
+			}
+		}
+		
+		protected EcsProvider(IDictionary<Type, TSubject> subjectsMap) {
+			this.subjectsMap = subjectsMap;
+		}
+		
+		protected void ExecuteFor<T>(Action<TSubject> callback) where T: TSubject {
+			if (subjectsMap.TryGetValue(typeof(T), out var subject)) {
+				callback(subject);
+			}
+		}
+		
+		protected void ExecuteForAll(Action<TSubject> callback) {
+			foreach (var subject in subjectsMap.Values) {
+				callback(subject);
 			}
 		}
 
 		public T Get<T>() where T : TSubject {
 			var key = typeof(T);
-			return subjects.TryGetValue(key, out var subject)
+			return subjectsMap.TryGetValue(key, out var subject)
 				? (T)subject
-				: throw new NullReferenceException($"Subject of type {key} doesn't registered in entity!");
+				: throw new NullReferenceException($"{typeof(TSubject).Name} of type {key} doesn't registered!");
 		}
 
 		public bool TryGet<T>(out T subject) where T : TSubject {
@@ -30,13 +41,13 @@ namespace EXRCore.EcsFramework {
 				subject = Get<T>();
 			} catch (NullReferenceException exception) {
 				Debug.LogError(exception.Message);
-				subject = default; 
+				subject = default;
 				return false;
 			}
 			
 			return true;
 		}
 		
-		public bool Contains<T>() where T : TSubject => subjects.ContainsKey(typeof(T));
+		public bool Contains<T>() where T : TSubject => subjectsMap.ContainsKey(typeof(T));
 	}
 }

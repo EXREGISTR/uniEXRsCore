@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 namespace EXRCore.EcsFramework {
 	public sealed class EcsWorld : IService {
 		private readonly Dictionary<GameObject, IEntity> spawnedEntitiesByObject = new();
-		private static Dictionary<Type, EntityConfig> configsMap;
+		private static IReadOnlyDictionary<Type, EntityConfig> configsMap;
 		
 		private EcsWorld() { }
 		
@@ -25,11 +25,13 @@ namespace EXRCore.EcsFramework {
 
 		public static Task InitializeConfigsAsync(IReadOnlyCollection<EntityConfig> configs) {
 			var task = new Task(() => {
-				configsMap = new Dictionary<Type, EntityConfig>(configs.Count);
+				var configsTemp = new Dictionary<Type, EntityConfig>(configs.Count);
 				foreach (var config in configs) {
-					configsMap[config.GetType()] = config;
+					configsTemp[config.GetType()] = config;
 					config.Initialize();
 				}
+				
+				configsMap = configsTemp;
 			});
 			task.Start();
 			return task;
@@ -50,7 +52,7 @@ namespace EXRCore.EcsFramework {
 			config = founded;
 			return true;
 		}
-		
+
 		public Entity CreateEntity(GameObject owner, EcsComponentsProvider components = null, EcsSystemsProvider systems = null, 
 			bool enableSystemsByDefault = true) {
 			var entity = new Entity(owner, components, systems, enableSystemsByDefault);
@@ -77,7 +79,7 @@ namespace EXRCore.EcsFramework {
 		}
 		
 		public Entity GetFromPool<TPool>() where TPool: PoolProvider<Entity> {
-			var entity = ServiceLocator.GetService<PoolService>().Get<TPool, Entity>();
+			var entity = Service<PoolService>.Instance.Get<TPool, Entity>();
 			((IEntity)entity).OnEnable();
 			spawnedEntitiesByObject[entity.Owner] = entity;
 			return entity;
@@ -86,7 +88,7 @@ namespace EXRCore.EcsFramework {
 		public void ReturnToPool<TPool>(IEntity entity) where TPool: PoolProvider<Entity> {
 			entity.OnDisable();
 			spawnedEntitiesByObject.Remove(entity.Owner);
-			ServiceLocator.GetService<PoolService>().Return<TPool, Entity>((Entity)entity);
+			Service<PoolService>.Instance.Return<TPool, Entity>((Entity)entity);
 		} 
 		
 		public void Destroy(IEntity entity) {
