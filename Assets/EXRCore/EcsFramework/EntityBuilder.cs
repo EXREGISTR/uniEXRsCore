@@ -24,7 +24,6 @@ namespace EXRCore.EcsFramework {
 				return this;
 			}
 			
-			ServiceContainer.ExecuteInjection(component);
 			components[key] = component;
 			return this;
 		}

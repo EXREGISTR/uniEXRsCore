@@ -35,15 +35,23 @@ namespace EXRCore.EcsFramework {
 		}
 		
 		public void RegisterSystem<T>(Func<T> creator) where T : class, IEcsSystem {
-			Register(typeof(T), systems, creator);
+			Register(typeof(T), systems, () => {
+				var system = creator();
+				ServiceContainer.ExecuteInjection(system);
+				return system;
+			});
 		}
-		
+
 		public void ReplaceComponent<T>(Func<T> creator) where T : class, IPersistentComponent {
 			Replace(typeof(T), components, creator, true);
 		}
 		
 		public void ReplaceSystem<T>(Func<T> creator) where T : class, IEcsSystem {
-			Replace(typeof(T), systems, creator, true);
+			Replace(typeof(T), systems, () => {
+				var system = creator();
+				ServiceContainer.ExecuteInjection(system);
+				return system;
+			}, true);
 		}
 
 		public void UnregisterComponent<T>() where T : class, IPersistentComponent => components.Remove(typeof(T));
@@ -65,12 +73,8 @@ namespace EXRCore.EcsFramework {
 			}
 
 			if (needToRemove) target.Remove(subjectType);
-			
-			target[subjectType] = () => {
-				var component = creator();
-				ServiceContainer.ExecuteInjection(component);
-				return component;
-			};
+
+			target[subjectType] = creator;
 		}
 	}
 }
