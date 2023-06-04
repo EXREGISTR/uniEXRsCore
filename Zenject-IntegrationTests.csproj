@@ -57,8 +57,8 @@
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Installers\TestInstallers\QuxInstaller.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestDiContainerMethods\Foo.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromNewScriptableObjectResource\Foo.cs" />
-     <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromPrefab\Bar.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromSubContainerPrefab\CircFoo.cs" />
+     <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromPrefab\Bar.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Misc\TestZenAutoInjecter\Gorp.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromComponentInHierarchyGameObjectContext\FooInstaller.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\SceneTests\TestDestructionOrder\FooDisposable3.cs" />
@@ -92,15 +92,15 @@
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Misc\TestZenAutoInjecter\Bar.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromSubContainerPrefabResource\Gorp.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestInstantiateCallback\Foo.cs" />
-     <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromGameObjectInstaller\Bar.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromPrefabResource\Jim.cs" />
+     <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromGameObjectInstaller\Bar.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\SceneTests\TestDestructionOrder\FooDisposable1.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromPrefabInstaller\Bar.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromPrefabResource\Bob.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromPrefab\Gorp.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\SceneContractTests\Decorators\Scene1Installer.cs" />
-     <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\SceneTests\TestDestructionOrder\Scene1Installer.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Installers\TestMonoInstallers\BarInstaller.cs" />
+     <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\SceneTests\TestDestructionOrder\Scene1Installer.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\SceneTests\TestDestructionOrder\ProjectInstaller.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromPrefabResource\Norf.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\SceneTests\TestDestructionOrder\Scene2Installer.cs" />
@@ -110,8 +110,8 @@
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromPrefab\Norf.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\SceneTests\TestDestructionOrder\FooMonoBehaviourUnderSceneContext1.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\SceneTests\TestDestructionOrder\FooDisposable2.cs" />
-     <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromPrefabResource\Gorp.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromPrefabResource\Foo.cs" />
+     <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromPrefabResource\Gorp.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Factories\TestBindFactoryOne\Foo.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromSubContainerPrefab\Gorp.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Bindings\TestFromSubContainerPrefab\FooInstaller.cs" />

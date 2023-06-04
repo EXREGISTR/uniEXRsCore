@@ -29,7 +29,7 @@ namespace EXRCore.EcsFramework {
 		}
 
 		public static void RegisterComponent<TComponent, TConfig>(this EcsWorld world, Func<TComponent> component) 
-			where TComponent: IPersistentComponent 
+			where TComponent: class, IPersistentComponent 
 			where TConfig : EntityConfig {
 			if (EcsWorld.TryGetConfig<TConfig>(out var config)) {
 				config.RegisterComponent(component);
@@ -37,7 +37,7 @@ namespace EXRCore.EcsFramework {
 		}
 		
 		public static void ReplaceComponent<TComponent, TConfig>(this EcsWorld world, Func<TComponent> component) 
-			where TComponent: IPersistentComponent 
+			where TComponent: class, IPersistentComponent 
 			where TConfig : EntityConfig {
 			if (EcsWorld.TryGetConfig<TConfig>(out var config)) {
 				config.ReplaceComponent(component);
@@ -45,7 +45,7 @@ namespace EXRCore.EcsFramework {
 		}
 
 		public static void UnregisterComponent<TComponent, TConfig>(this EcsWorld world)
-			where TComponent : IPersistentComponent
+			where TComponent : class, IPersistentComponent
 			where TConfig : EntityConfig {
 			if (EcsWorld.TryGetConfig<TConfig>(out var config)) {
 				config.UnregisterComponent<TComponent>();
@@ -53,7 +53,7 @@ namespace EXRCore.EcsFramework {
 		}
 		
 		public static void RegisterSystem<TSystem, TConfig>(this EcsWorld world, Func<TSystem> system) 
-			where TSystem : IEcsSystem
+			where TSystem : class, IEcsSystem
 			where TConfig : EntityConfig {
 			if (EcsWorld.TryGetConfig<TConfig>(out var config)) {
 				config.RegisterSystem(system);
@@ -61,7 +61,7 @@ namespace EXRCore.EcsFramework {
 		}
 		
 		public static void ReplaceSystem<TSystem, TConfig>(this EcsWorld world, Func<TSystem> system) 
-			where TSystem : IEcsSystem
+			where TSystem : class, IEcsSystem
 			where TConfig : EntityConfig {
 			if (EcsWorld.TryGetConfig<TConfig>(out var config)) {
 				config.ReplaceSystem(system);
@@ -69,7 +69,7 @@ namespace EXRCore.EcsFramework {
 		}
 		
 		public static void UnregisterSystem<TSystem, TConfig>(this EcsWorld world)
-			where TSystem : IEcsSystem
+			where TSystem : class, IEcsSystem
 			where TConfig : EntityConfig {
 			if (EcsWorld.TryGetConfig<TConfig>(out var config)) {
 				config.UnregisterSystem<TSystem>();

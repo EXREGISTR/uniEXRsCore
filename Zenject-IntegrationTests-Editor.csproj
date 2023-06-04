@@ -50,8 +50,8 @@
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Tests\Bindings\TestFromComponent\TestFromNewComponentOn.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Tests\Factories\TestBindFactoryOne\TestBindFactoryOne.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Tests\Bindings\TestFromGameObject\TestFromGameObject.cs" />
-     <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Tests\Bindings\TestFromSubContainerPrefabResource\TestFromSubContainerPrefabResource.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Tests\Bindings\TestFromPrefabInstaller\TestFromPrefabInstaller.cs" />
+     <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Tests\Bindings\TestFromSubContainerPrefabResource\TestFromSubContainerPrefabResource.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Tests\Bindings\TestFromPrefabResource\TestFromPrefabResource.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Tests\IntegrationTestTester\TestIntegrationTest.cs" />
      <Compile Include="Assets\Plugins\Zenject\OptionalExtras\IntegrationTests\Tests\Util\FixtureUtil.cs" />

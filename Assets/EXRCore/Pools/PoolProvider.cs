@@ -1,5 +1,5 @@
 ﻿using System;
-using EXRCore.Services;
+using EXRCore.DIContainer;
 using UnityEngine;
 
 namespace EXRCore.Pools {
@@ -9,6 +9,9 @@ namespace EXRCore.Pools {
 
 	public abstract class PoolProvider<T> : MonoBehaviour, IPoolProvider where T : IPoolObject {
 		[SerializeField] private int count;
+		
+		[InjectService] private PoolService poolService;
+		
 		private Pool<T> pool;
 
 		public Type Type { get; }
@@ -16,11 +19,11 @@ namespace EXRCore.Pools {
 		protected PoolProvider() => Type = GetType();
 		
 		private void Awake() {
-			Service<PoolService>.Instance.Register(this);
+			poolService.Register(this);
 			pool = new Pool<T>(Factory, Resetter, count);
 		}
 		
-		private void OnDestroy() => Service<PoolService>.Instance.Unregister(this);
+		private void OnDestroy() => poolService.Unregister(this);
 
 		public T Get() => pool.Get();
 		public void Return(T @object) => pool.Return(@object);

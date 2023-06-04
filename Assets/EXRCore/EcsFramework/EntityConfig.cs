@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using EXRCore.DIContainer;
 using UnityEngine;
 
 namespace EXRCore.EcsFramework {
@@ -19,8 +20,7 @@ namespace EXRCore.EcsFramework {
 		private readonly Dictionary<Type, Func<IPersistentComponent>> components = new();
 		private readonly Dictionary<Type, Func<IEcsSystem>> systems = new();
 		
-		[SerializeField] 
-		private GameObject prefab;
+		[SerializeField] private GameObject prefab;
 		
 		internal abstract void Initialize();
 		
@@ -30,26 +30,26 @@ namespace EXRCore.EcsFramework {
 			return new EntityData(prefab, componentsProvider, systemsProvider);
 		}
 
-		public void RegisterComponent<T>(Func<T> creator) where T: IPersistentComponent {
-			Register(typeof(T), components, () => creator());
+		public void RegisterComponent<T>(Func<T> creator) where T: class, IPersistentComponent {
+			Register(typeof(T), components, creator);
+		}
+		
+		public void RegisterSystem<T>(Func<T> creator) where T : class, IEcsSystem {
+			Register(typeof(T), systems, creator);
+		}
+		
+		public void ReplaceComponent<T>(Func<T> creator) where T : class, IPersistentComponent {
+			Replace(typeof(T), components, creator, true);
+		}
+		
+		public void ReplaceSystem<T>(Func<T> creator) where T : class, IEcsSystem {
+			Replace(typeof(T), systems, creator, true);
 		}
 
-		public void RegisterSystem<T>(Func<T> creator) where T : IEcsSystem {
-			Register(typeof(T), systems, () => creator());
-		}
-		
-		public void ReplaceComponent<T>(Func<T> creator) where T : IPersistentComponent {
-			Replace(typeof(T), components, () => creator(), true);
-		}
-		
-		public void ReplaceSystem<T>(Func<T> creator) where T : IEcsSystem {
-			Replace(typeof(T), systems, () => creator(), true);
-		}
+		public void UnregisterComponent<T>() where T : class, IPersistentComponent => components.Remove(typeof(T));
+		public void UnregisterSystem<T>() where T: class, IEcsSystem => systems.Remove(typeof(T));
 
-		public void UnregisterComponent<T>() where T: IPersistentComponent => components.Remove(typeof(T));
-		public void UnregisterSystem<T>() where T: IEcsSystem => systems.Remove(typeof(T));
-		
-		private static void Register<T>(Type subjectType, IDictionary<Type, Func<T>> target, Func<T> creator) where T: IEcsSubject {
+		private static void Register<T>(Type subjectType, IDictionary<Type, Func<T>> target, Func<T> creator) where T: class, IEcsSubject {
 			if (target.ContainsKey(subjectType)) {
 				Debug.LogWarning($"Creator for subject {subjectType} already registered");
 				return;
@@ -57,14 +57,20 @@ namespace EXRCore.EcsFramework {
 			
 			Replace(subjectType, target, creator, false);
 		}
+		
 		private static void Replace<T>(Type subjectType, IDictionary<Type, Func<T>> target, Func<T> creator, bool needToRemove) 
-			where T: IEcsSubject {
+			where T: class, IEcsSubject {
 			if (subjectType.IsAbstract) {
 				throw new ArgumentException("Impossible to register key of abstract subject!");
 			}
 
 			if (needToRemove) target.Remove(subjectType);
-			target[subjectType] = creator;
+			
+			target[subjectType] = () => {
+				var component = creator();
+				ServiceContainer.ExecuteInjection(component);
+				return component;
+			};
 		}
 	}
 }

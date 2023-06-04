@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using EXRCore.Services;
+using EXRCore.DIContainer;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -10,10 +10,12 @@ namespace EXRCore.EcsFramework {
 		
 		private IDictionary<Type, IPersistentComponent> components;
 		private IDictionary<Type, IEcsSystem> systems;
-
-		public EntityBuilder(GameObject prefab) => this.prefab = prefab;
 		
-		public EntityBuilder AddComponent<T>(T component) where T : IPersistentComponent {
+		[InjectService] private EcsWorld world;
+		
+		public EntityBuilder(GameObject prefab) => this.prefab = prefab;
+
+		public EntityBuilder AddComponent<T>(T component) where T : class, IPersistentComponent {
 			var key = typeof(T);
 			
 			components ??= new Dictionary<Type, IPersistentComponent>();
@@ -21,12 +23,13 @@ namespace EXRCore.EcsFramework {
 				Debug.LogWarning($"Component {key} already registered in builder!");
 				return this;
 			}
-
+			
+			ServiceContainer.ExecuteInjection(component);
 			components[key] = component;
 			return this;
 		}
 
-		public EntityBuilder AddSystem<T>(T system) where T : IEcsSystem {
+		public EntityBuilder AddSystem<T>(T system) where T : class, IEcsSystem {
 			var key = typeof(T);
 			
 			systems ??= new Dictionary<Type, IEcsSystem>();
@@ -35,6 +38,7 @@ namespace EXRCore.EcsFramework {
 				return this;
 			}
 			
+			ServiceContainer.ExecuteInjection(system);
 			systems[key] = system;
 			return this;
 		}
@@ -44,7 +48,7 @@ namespace EXRCore.EcsFramework {
 			var systemsProvider = systems != null ? new EcsSystemsProvider(systems) : null;
 
 			GameObject owner = Object.Instantiate(prefab, position, rotation, parent);
-			return Service<EcsWorld>.Instance.CreateEntity(owner, componentsProvider, systemsProvider);
+			return world.CreateEntity(owner, componentsProvider, systemsProvider);
 		}
 	}
 }

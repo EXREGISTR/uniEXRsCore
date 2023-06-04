@@ -1,27 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EXRCore.DIContainer;
 using EXRCore.Pools;
-using EXRCore.Services;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace EXRCore.EcsFramework {
-	public sealed class EcsWorld : IService {
+	public sealed class EcsWorld {
 		private readonly Dictionary<GameObject, IEntity> spawnedEntitiesByObject = new();
 		private static IReadOnlyDictionary<Type, EntityConfig> configsMap;
 		
-		private EcsWorld() { }
-		
-		public static EcsWorld Create() {
-			if (ServiceLocator.TryGetService(out EcsWorld world)) {
-				world.spawnedEntitiesByObject.Clear();
-			}
-			
-			world = new EcsWorld();
-			ServiceLocator.Replace(world);
-			return world;
-		}
+		[InjectService]
+		private PoolService poolService;
 
 		public static Task InitializeConfigsAsync(IReadOnlyCollection<EntityConfig> configs) {
 			var task = new Task(() => {
@@ -79,7 +70,7 @@ namespace EXRCore.EcsFramework {
 		}
 		
 		public Entity GetFromPool<TPool>() where TPool: PoolProvider<Entity> {
-			var entity = Service<PoolService>.Instance.Get<TPool, Entity>();
+			var entity = poolService.Get<TPool, Entity>();
 			((IEntity)entity).OnEnable();
 			spawnedEntitiesByObject[entity.Owner] = entity;
 			return entity;
@@ -88,7 +79,7 @@ namespace EXRCore.EcsFramework {
 		public void ReturnToPool<TPool>(IEntity entity) where TPool: PoolProvider<Entity> {
 			entity.OnDisable();
 			spawnedEntitiesByObject.Remove(entity.Owner);
-			Service<PoolService>.Instance.Return<TPool, Entity>((Entity)entity);
+			poolService.Return<TPool, Entity>((Entity)entity);
 		} 
 		
 		public void Destroy(IEntity entity) {
