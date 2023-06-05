@@ -54,10 +54,36 @@ namespace EXRCore.DIContainer {
 		public void RegisterNonLazy<TInterface, TService>(TService service) where TService : class, TInterface {
 			RegisterInstanceInternal(typeof(TInterface), typeof(TService), service);
 		}
-		#endregion
 		
-		// параметр key может быть типом базового класса
-		private bool TryResolveService(Type type, out object service) {
+		/// <summary>
+		/// Returns or creates a service of T type
+		/// </summary>
+		/// <typeparam name="T">the type for which the service was registered (can be base class, interface or implementation type) </typeparam>
+		/// <exception cref="ServiceContainerException">if the operation was failed</exception>
+		public T ResolveService<T>() where T : class {
+			return TryResolveServiceInternal(typeof(T), out var service)
+				? (T)service
+				: throw new ServiceContainerException("Failed to create service");
+		}
+
+		/// <summary>
+		/// Returns or creates a service of T type
+		/// </summary>
+		/// <typeparam name="T">the type for which the service was registered (can be base class, interface or implementation type) </typeparam>
+		/// <returns>true if the operation was successful</returns>
+		public bool TryResolveService<T>(out T service) where T : class {
+			if (TryResolveServiceInternal(typeof(T), out var founded)) {
+				service = founded as T;
+				return true;
+			}
+			
+			service = null;
+			return false;
+		}
+		#endregion
+
+		// параметр type может быть типом базового класса
+		private bool TryResolveServiceInternal(Type type, out object service) {
 			// пробуем получить сервис, зарегистрированный на переданный тип
 			if (TryGetServiceInternal(type, out service)) return true;
 			

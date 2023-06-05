@@ -13,7 +13,7 @@ namespace EXRCore.DIContainer {
 		
 			public void Inject(object target, ServiceContainer container) {
 				foreach (var field in fieldsToInject) {
-					if (container.TryResolveService(field.FieldType, out var service)) {
+					if (container.TryResolveServiceInternal(field.FieldType, out var service)) {
 						field.SetValue(target, service);
 					}
 				}
