@@ -6,15 +6,29 @@ using UnityEngine;
 
 namespace EXRCore.DIContainer {
 	public partial class ServiceContainer {
-		private static IReadOnlyDictionary<Type, Descriptor> descriptorsByObjectType;
+		private sealed class TypeDescriptor {
+			private readonly List<FieldInfo> fieldsToInject = new();
+			public bool IsEmpty => fieldsToInject.Count == 0;
+			public void AddField(FieldInfo field) => fieldsToInject.Add(field);
+		
+			public void Inject(object target, ServiceContainer container) {
+				foreach (var field in fieldsToInject) {
+					if (container.TryResolveService(field.FieldType, out var service)) {
+						field.SetValue(target, service);
+					}
+				}
+			}
+		}
+		
+		private static IReadOnlyDictionary<Type, TypeDescriptor> descriptorsByObjectType;
 		
 		[InitializeOnEnterPlayMode]
 		private static void CreateDescriptors() {
 			var allTypes = Assembly.GetExecutingAssembly().GetTypes();
-			var descriptors = new Dictionary<Type, Descriptor>();
+			var descriptors = new Dictionary<Type, TypeDescriptor>();
 			var attributeType = typeof(InjectServiceAttribute);
 			foreach (var type in allTypes) {
-				var descriptor = new Descriptor();
+				var descriptor = new TypeDescriptor();
 				foreach (var field in type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance)) {
 					if (HandleField(field, attributeType)) {
 						descriptor.AddField(field);
@@ -31,18 +45,20 @@ namespace EXRCore.DIContainer {
 		
 		private static bool HandleField(FieldInfo field, Type attributeType) {
 			if (field.GetCustomAttribute(attributeType) == null) return false;
-			if (field.FieldType.IsAbstract) {
-				Debug.LogError("Field with inject attribute cannot be with abstract type!");
-				return false;
-			}
-
+			if (field.FieldType == typeof(object)) return false;
+			
 			return true;
 		}
 		
 		public static void ExecuteInjection<T>(T target) where T : class => ExecuteInjectionInternal(typeof(T), target);
 		
 		private static void ExecuteInjectionInternal(Type type, object target) {
-			if (descriptorsByObjectType.TryGetValue(type, out var descriptor)) {
+			if (type.IsAbstract) { 
+				Debug.LogWarning("You trying to execute injection to abstract type!");
+				return;
+			}
+			
+			if (descriptorsByObjectType.TryGetValue(type, out TypeDescriptor descriptor)) {
 				descriptor.Inject(target, current);
 			}
 		}

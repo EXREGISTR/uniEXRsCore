@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace EXRCore.DIContainer {
 	public partial class ServiceContainer : IDisposable {
 		private readonly IDictionary<Type, object> aliveServicesByType = new Dictionary<Type, object>();
 		private readonly IDictionary<Type, IDisposable> disposableServicesByType = new Dictionary<Type, IDisposable>();
-		private readonly IDictionary<Type, IScope> servicesScopes = new Dictionary<Type, IScope>();
-
+		private readonly IDictionary<Type, ServiceDescriptor> serviceDescriptors = new Dictionary<Type, ServiceDescriptor>();
+		
 		private static readonly object syncObject = new();
 		private static ServiceContainer current;
 		
@@ -21,43 +22,80 @@ namespace EXRCore.DIContainer {
 			return current;
 		}
 		
-		public void Register<T>(T service) where T : class {
-			var type = typeof(T);
-			if (ContainsService(type)) return;
-			
-			RegisterService(type, service);
-			ExecuteInjectionInternal(type, service);
+		#region API
+		public void Register<TService>(Func<TService> creator) where TService : class {
+			RegisterInternal(typeof(TService), typeof(TService), creator);
 		}
 		
-		public void RegisterLazy<T>(Func<T> serviceCreator) where T: class {
-			var key = typeof(T);
-			if (servicesScopes.ContainsKey(key)) return;
-
-			var scope = new SingletonScope(CreateScopeWrapper(serviceCreator));
-			servicesScopes[key] = scope;
+		public void Register<TService>() where TService : class, new() {
+			RegisterInternal(typeof(TService), typeof(TService), () => new TService());
+		} 
+		
+		public void Register<TInterface, TService>(Func<TService> creator) where TService : class, TInterface {
+			RegisterInternal(typeof(TInterface), typeof(TService), creator);
 		}
 		
-		private static Func<object> CreateScopeWrapper<T>(Func<T> creator) where T: class {
-			object Wrapper() {
-				var type = typeof(T);
-				var service = creator();
-				ExecuteInjectionInternal(type, service);
-				return service;
+		public void Register<TInterface, TService>() where TService : class, TInterface, new() {
+			RegisterInternal(typeof(TInterface), typeof(TService), () => new TService());
+		}
+
+		public void RegisterNonLazy<TService>() where TService : class, new() {
+			RegisterInstanceInternal(typeof(TService), typeof(TService), new TService());
+		}
+
+		public void RegisterNonLazy<TInterface, TService>() where TService : class, TInterface, new() {
+			RegisterInstanceInternal(typeof(TInterface), typeof(TService), new TService());
+		}
+		
+		public void RegisterNonLazy<TService>(TService service) where TService : class {
+			RegisterInstanceInternal(typeof(TService), typeof(TService), service);
+		}
+		
+		public void RegisterNonLazy<TInterface, TService>(TService service) where TService : class, TInterface {
+			RegisterInstanceInternal(typeof(TInterface), typeof(TService), service);
+		}
+		#endregion
+		
+		// параметр key может быть типом базового класса
+		private bool TryResolveService(Type type, out object service) {
+			// пробуем получить сервис, зарегистрированный на переданный тип
+			if (TryGetServiceInternal(type, out service)) return true;
+			
+			if (!serviceDescriptors.TryGetValue(type, out var descriptor)) {
+				Debug.LogError($"Creator for {type} doesn't registered in container!");
+				return false;
+			}
+
+			if (type.IsAbstract) {
+				// если тип абстрактный, то проверим его наличие по конкретному типу
+				if (TryGetServiceInternal(descriptor.ImplementationType, out service)) return true;
+			}
+
+			// сервис не зарегистрирован значит создаем его
+			service = descriptor.Resolve();
+			RegisterInstanceInternal(type, descriptor.ImplementationType, service);
+			return true;
+		}
+
+		// параметр key может быть типом базового класса, от которого наследован serviceType, либо же совпадать с ним
+		private void RegisterInternal(Type key, Type serviceType, Func<object> creator) {
+			if (key == typeof(object)) {
+				throw new ServiceContainerException("Impossible register creator for object type");
+			}
+
+			if (serviceDescriptors.ContainsKey(key)) {
+				Debug.LogWarning($"Service creator already registered by key {key}!");
+				return;
 			}
 			
-			return Wrapper;
-		}
-
-		public bool TryGetService<T>(out T service) where T: class {
-			if (TryGetServiceInternal(typeof(T), out var founded)) {
-				service = founded as T;
+			if (TryGetServiceInternal(key, out var existing)) {
+				Debug.LogWarning($"You trying to register creator for already existing service {existing}!");
+				return;
 			}
-
-			service = null;
-			return false;
+			
+			var serviceCreator = new ServiceDescriptor(creator, serviceType);
+			serviceDescriptors[key] = serviceCreator;
 		}
-
-		private bool ContainsService(Type key) => TryGetServiceInternal(key, out _);
 		
 		private bool TryGetServiceInternal(Type key, out object service) {
 			if (aliveServicesByType.TryGetValue(key, out service)) return true;
@@ -69,26 +107,15 @@ namespace EXRCore.DIContainer {
 			return false;
 		}
 
-		public bool TryResolveService(Type type, out object service) {
-			service = null;
-			if (ContainsService(type)) return false;
-			if (!servicesScopes.ContainsKey(type)) return false;
+		private void RegisterInstanceInternal(Type key, Type implementationType, object service) {
+			// если сервис содержит атрибуты инъекции, то зависимости будут переданы
+			ExecuteInjectionInternal(implementationType, service);
 			
-			service = Resolve(type);
-			return true;
-		}
-
-		private object Resolve(Type type) {
-			var service = servicesScopes[type].Resolve();
-			RegisterService(type, service);
-			return service;
-		}
-
-		private void RegisterService(Type type, object service) {
+			// регистрация
 			if (service is IDisposable disposable) {
-				disposableServicesByType[type] = disposable;
+				disposableServicesByType[key] = disposable;
 			} else {
-				aliveServicesByType[type] = service;
+				aliveServicesByType[key] = service;
 			}
 		}
 
@@ -101,5 +128,9 @@ namespace EXRCore.DIContainer {
 			disposableServicesByType.Clear();
 			current = null;
 		}
+	}
+
+	public class ServiceContainerException : Exception {
+		public ServiceContainerException(string message) : base(message) { }
 	}
 }

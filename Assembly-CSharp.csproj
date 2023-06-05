@@ -46,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\EXRCore\EcsFramework\System\IEcsSystem.cs" />
-     <Compile Include="Assets\EXRCore\DIContainer\Descriptor.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Tools\ScreenContainer.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Screen\Screen.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Tools\InitializatorUI.cs" />
@@ -54,7 +53,7 @@
      <Compile Include="Assets\EXRCore\EcsFramework\Entity.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\ViewHandler\ViewHandler.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Extenssions.cs" />
-     <Compile Include="Assets\EXRCore\DIContainer\Scopes.cs" />
+     <Compile Include="Assets\EXRCore\DIContainer\ServiceDescriptor.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\IEntity.cs" />
      <Compile Include="Assets\EXRCore\DIContainer\Installer.cs" />
      <Compile Include="Assets\EXRCore\Attributes\ReadOnlyDrawer.cs" />
