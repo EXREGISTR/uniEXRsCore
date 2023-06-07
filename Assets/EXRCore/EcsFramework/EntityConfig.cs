@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using EXRCore.DIContainer;
 using UnityEngine;
 
 namespace EXRCore.EcsFramework {
@@ -35,7 +34,7 @@ namespace EXRCore.EcsFramework {
 		}
 		
 		public void RegisterSystem<T>(Func<T> creator) where T : class, IEcsSystem {
-			Register(typeof(T), systems, CreateFactoryWrapper(creator));
+			Register(typeof(T), systems, creator);
 		}
 
 		public void ReplaceComponent<T>(Func<T> creator) where T : class, IPersistentComponent {
@@ -43,20 +42,12 @@ namespace EXRCore.EcsFramework {
 		}
 		
 		public void ReplaceSystem<T>(Func<T> creator) where T : class, IEcsSystem {
-			Replace(typeof(T), systems, CreateFactoryWrapper(creator), true);
+			Replace(typeof(T), systems, creator, true);
 		}
 		
 		public void UnregisterComponent<T>() where T : class, IPersistentComponent => components.Remove(typeof(T));
 		public void UnregisterSystem<T>() where T: class, IEcsSystem => systems.Remove(typeof(T));
-		
-		private static Func<T> CreateFactoryWrapper<T>(Func<T> creator) where T : class {
-			return () => {
-				var instance = creator();
-				ServiceContainer.ExecuteInjection(instance);
-				return instance;
-			};
-		}
-		
+
 		private static void Register<T>(Type subjectType, IDictionary<Type, Func<T>> target, Func<T> creator) where T: class, IEcsSubject {
 			if (target.ContainsKey(subjectType)) {
 				Debug.LogWarning($"Creator for subject {subjectType} already registered");
@@ -73,7 +64,6 @@ namespace EXRCore.EcsFramework {
 			}
 
 			if (needToRemove) target.Remove(subjectType);
-
 			target[subjectType] = creator;
 		}
 	}

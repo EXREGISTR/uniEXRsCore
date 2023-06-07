@@ -46,16 +46,24 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\EXRCore\EcsFramework\System\IEcsSystem.cs" />
+     <Compile Include="Assets\EXRCore\Services\IDisposableService.cs" />
+     <Compile Include="Assets\EXRCore\Services\IService.cs" />
+     <Compile Include="Assets\EXRCore\Services\IServiceContainer.cs" />
+     <Compile Include="Assets\EXRCore\Services\ServiceContainer.cs" />
+     <Compile Include="Assets\EXRCore\Services\Utils\Extenssions.cs" />
+     <Compile Include="Assets\EXRCore\Services\Utils\Installer.cs" />
+     <Compile Include="Assets\EXRCore\Services\Utils\Service.cs" />
+     <Compile Include="Assets\EXRCore\Services\Utils\ServiceContainerInstaller.cs" />
+     <Compile Include="Assets\EXRCore\Services\Wrappers\IServiceWrapper.cs" />
+     <Compile Include="Assets\EXRCore\Services\Wrappers\ServiceWrapperBasedFactory.cs" />
+     <Compile Include="Assets\EXRCore\Services\Wrappers\ServiceWrapperBasedInstance.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Tools\ScreenContainer.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Screen\Screen.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Tools\InitializatorUI.cs" />
-     <Compile Include="Assets\EXRCore\DIContainer\ServiceContainerProvider.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Entity.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\ViewHandler\ViewHandler.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Extenssions.cs" />
-     <Compile Include="Assets\EXRCore\DIContainer\ServiceDescriptor.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\IEntity.cs" />
-     <Compile Include="Assets\EXRCore\DIContainer\Installer.cs" />
      <Compile Include="Assets\EXRCore\Attributes\ReadOnlyDrawer.cs" />
      <Compile Include="Assets\EXRCore\Attributes\ReadOnlyAttribute.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\ViewHandler\IViewHandler.cs" />
@@ -64,7 +72,6 @@
      <Compile Include="Assets\EXRCore\EcsFramework\EntityConfig.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
      <Compile Include="Assets\EXRCore\Pools\PoolProvider.cs" />
-     <Compile Include="Assets\EXRCore\DIContainer\ServiceContainer.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\EcsWorld.cs" />
      <Compile Include="Assets\EXRCore\EventBus\IMessage.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Screen\IScreen.cs" />
@@ -86,9 +93,7 @@
      <Compile Include="Assets\EXRCore\EcsFramework\Providers\EcsProvider.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Utils\CallbacksWrapper.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Component\IDynamicComponent.cs" />
-     <Compile Include="Assets\EXRCore\DIContainer\ServiceContainer.Reflection.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\UIService.cs" />
-     <Compile Include="Assets\EXRCore\DIContainer\InjectServiceAttribute.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Providers\EcsSystemsProvider.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Component\IEntityComponent.cs" />
      <Folder Include="Assets" />
@@ -101,7 +106,6 @@
      <Folder Include="Assets\EXRCore\EventBus" />
      <Folder Include="Assets\EXRCore\Attributes" />
      <Folder Include="Assets\EXRCore\Pools" />
-     <Folder Include="Assets\EXRCore" />
      <Folder Include="Assets\EXRCore\EcsFramework" />
      <Folder Include="Assets\EXRCore\EcsFramework\Providers" />
      <Folder Include="Assets\EXRCore\EcsFramework\System" />
@@ -109,7 +113,6 @@
      <Folder Include="Assets\TutorialInfo\Icons" />
      <Folder Include="Assets\EXRCore\UIFramework" />
      <Folder Include="Assets\EXRCore\EcsFramework\Utils" />
-     <Folder Include="Assets\EXRCore\DIContainer" />
      <Reference Include="UnityEngine">
      <HintPath>F:\Unity\2022.2.1f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
      </Reference>

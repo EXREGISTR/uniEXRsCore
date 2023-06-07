@@ -1,22 +1,22 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace EXRCore.DIContainer {
-	[DefaultExecutionOrder(-10000)]
-	public class ServiceContainerProvider : MonoBehaviour {
-		[SerializeField] private List<Installer> installers;
+namespace EXRCore.Services {
+	public sealed class ServiceContainerInstaller : MonoBehaviour {
+		[SerializeField] private Installer[] installers;
 		[SerializeField] private bool initializeOnAwake = true;
 		
-		private ServiceContainer container;
+		private IServiceContainer container;
 
 		private void Awake() {
 			if (!initializeOnAwake) return;
 			Initialize();
 		}
 
+		private void OnDestroy() => container?.Dispose();
+		
 		public void Initialize() {
 			if (container != null) {
-				Debug.LogError("Container already created!");
+				Debug.LogWarning("Container already created!");
 				return;
 			}
 			

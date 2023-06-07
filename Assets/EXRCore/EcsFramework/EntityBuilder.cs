@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using EXRCore.DIContainer;
+using EXRCore.Services;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -10,9 +10,7 @@ namespace EXRCore.EcsFramework {
 		
 		private IDictionary<Type, IPersistentComponent> components;
 		private IDictionary<Type, IEcsSystem> systems;
-		
-		[InjectService] private EcsWorld world;
-		
+
 		public EntityBuilder(GameObject prefab) => this.prefab = prefab;
 
 		public EntityBuilder AddComponent<T>(T component) where T : class, IPersistentComponent {
@@ -37,7 +35,6 @@ namespace EXRCore.EcsFramework {
 				return this;
 			}
 			
-			ServiceContainer.ExecuteInjection(system);
 			systems[key] = system;
 			return this;
 		}
@@ -45,9 +42,9 @@ namespace EXRCore.EcsFramework {
 		public Entity Create(Vector3 position, Quaternion rotation, Transform parent = null) {
 			var componentsProvider = components != null ? new EcsComponentsProvider(components) : null;
 			var systemsProvider = systems != null ? new EcsSystemsProvider(systems) : null;
-
+			
 			GameObject owner = Object.Instantiate(prefab, position, rotation, parent);
-			return world.CreateEntity(owner, componentsProvider, systemsProvider);
+			return Service<EcsWorld>.Instance.CreateEntity(owner, componentsProvider, systemsProvider);
 		}
 	}
 }

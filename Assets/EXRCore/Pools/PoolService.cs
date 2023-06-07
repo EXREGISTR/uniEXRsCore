@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using EXRCore.Services;
 using UnityEngine;
 
 namespace EXRCore.Pools {
-	public sealed class PoolService {
+	public sealed class PoolService : IService {
 		private readonly Dictionary<Type, IPoolProvider> poolProviders = new();
 
 		internal void Register(IPoolProvider provider) {

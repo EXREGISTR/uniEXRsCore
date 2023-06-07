@@ -7,7 +7,7 @@ namespace EXRCore.Pools {
 		private readonly Func<T> factory;
 		private readonly Action<T> resetter;
 		
-		public Pool(Func<T> factory, Action<T> resetter, int startCount = 8) {
+		public Pool(Func<T> factory, Action<T> resetter, int startCount) {
 			pool = new Queue<T>(startCount);
 			this.factory = factory;
 			this.resetter = resetter;

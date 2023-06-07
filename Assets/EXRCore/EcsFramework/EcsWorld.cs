@@ -1,31 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using EXRCore.DIContainer;
 using EXRCore.Pools;
+using EXRCore.Services;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace EXRCore.EcsFramework {
-	public sealed class EcsWorld {
+	public sealed class EcsWorld : IService {
 		private readonly Dictionary<GameObject, IEntity> spawnedEntitiesByObject = new();
 		private static IReadOnlyDictionary<Type, EntityConfig> configsMap;
 		
-		[InjectService]
-		private PoolService poolService;
-
-		public static Task InitializeConfigsAsync(IReadOnlyCollection<EntityConfig> configs) {
-			var task = new Task(() => {
-				var configsTemp = new Dictionary<Type, EntityConfig>(configs.Count);
-				foreach (var config in configs) {
-					configsTemp[config.GetType()] = config;
-					config.Initialize();
-				}
-				
-				configsMap = configsTemp;
-			});
-			task.Start();
-			return task;
+		private readonly PoolService poolService = Service<PoolService>.Instance;
+		
+		public static void InitializeConfigs(IReadOnlyCollection<EntityConfig> configs) {
+			var configsTemp = new Dictionary<Type, EntityConfig>(configs.Count);
+			foreach (var config in configs) { 
+				configsTemp[config.GetType()] = config; 
+				config.Initialize();
+			}
+			
+			configsMap = configsTemp;
 		}
 		
 		public static bool TryGetConfig<T>(out EntityConfig config) where T : EntityConfig {
