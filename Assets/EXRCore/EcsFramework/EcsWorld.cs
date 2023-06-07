@@ -9,9 +9,7 @@ namespace EXRCore.EcsFramework {
 	public sealed class EcsWorld : IService {
 		private readonly Dictionary<GameObject, IEntity> spawnedEntitiesByObject = new();
 		private static IReadOnlyDictionary<Type, EntityConfig> configsMap;
-		
-		private readonly PoolService poolService = Service<PoolService>.Instance;
-		
+
 		public static void InitializeConfigs(IReadOnlyCollection<EntityConfig> configs) {
 			var configsTemp = new Dictionary<Type, EntityConfig>(configs.Count);
 			foreach (var config in configs) { 
@@ -64,7 +62,7 @@ namespace EXRCore.EcsFramework {
 		}
 		
 		public Entity GetFromPool<TPool>() where TPool: PoolProvider<Entity> {
-			var entity = poolService.Get<TPool, Entity>();
+			var entity = Service<PoolService>.Instance.Get<TPool, Entity>();
 			((IEntity)entity).OnEnable();
 			spawnedEntitiesByObject[entity.Owner] = entity;
 			return entity;
@@ -73,7 +71,7 @@ namespace EXRCore.EcsFramework {
 		public void ReturnToPool<TPool>(IEntity entity) where TPool: PoolProvider<Entity> {
 			entity.OnDisable();
 			spawnedEntitiesByObject.Remove(entity.Owner);
-			poolService.Return<TPool, Entity>((Entity)entity);
+			Service<PoolService>.Instance.Return<TPool, Entity>((Entity)entity);
 		} 
 		
 		public void Destroy(IEntity entity) {

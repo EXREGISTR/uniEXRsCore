@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using EXRCore.Pools;
-using JetBrains.Annotations;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace EXRCore.EcsFramework {
 	public static class Extenssions {
-		public static void RegisterHandler<T>(this Entity entity, [NotNull] Action<T> onAddCallback,
-			[NotNull] Action onRemoveCallback)
+		public static void RegisterHandler<T>(this Entity entity, Action<T> onAddCallback, Action onRemoveCallback)
 			where T : IEntityMessage {
 			entity.RegisterHandler(onAddCallback);
 			entity.RegisterHandler<T>(onRemoveCallback);

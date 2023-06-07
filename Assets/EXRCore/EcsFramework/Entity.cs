@@ -12,7 +12,8 @@ namespace EXRCore.EcsFramework {
 		private IDictionary<Type, IDynamicComponent> dynamicComponents;
 		private IDictionary<Type, ICallbacksWrapper> onReceiveMessageCallbacks;
 		private IDictionary<Type, ICallbacksWrapper> onRemoveCallbacks;
-		
+		private IDictionary<Type, Component> cashedComponents;
+
 		public GameObject Owner { get; }
 		public Transform Transform => Owner.transform;
 		public Vector3 Position => Transform.position;
@@ -31,6 +32,29 @@ namespace EXRCore.EcsFramework {
 			systems?.Initialize(this, persistentComponents, enableSystemsNow);
 		}
 		
+		public void EnableSystem<T>() where T : IEcsSystem => systems.Enable<T>();
+		public void DisableSystem<T>() where T : IEcsSystem => systems.Disable<T>();
+
+		public T GetUnityComponent<T>() where T : Component {
+			var type = typeof(T);
+			if (cashedComponents != null && cashedComponents.TryGetValue(type, out var component)) {
+				return (T)component;
+			}
+			
+			component = Owner.GetComponent<T>();
+			if (component == null) return null;
+			
+			cashedComponents ??= new Dictionary<Type, Component>();
+			cashedComponents[type] = component;
+			return (T)component;
+		}
+		
+		public bool TryGetUnityComponent<T>(out T component) where T : Component {
+			component = GetUnityComponent<T>();
+			return component != null;
+		}
+		
+		#region Messages&Handlers
 		public void SendMessage<T>(T message) where T : IEntityMessage {
 			if (onReceiveMessageCallbacks == null) return;
 			var messageType = typeof(T);
@@ -39,10 +63,7 @@ namespace EXRCore.EcsFramework {
 				((OnReceivedMessagesCallbacks<T>)callbacks).Invoke(message);
 			}
 		}
-		
-		public void EnableSystem<T>() where T : IEcsSystem => systems.Enable<T>();
-		public void DisableSystem<T>() where T : IEcsSystem => systems.Disable<T>();
-		
+
 		public void RegisterHandler<T>(Action<T> onAddedCallback) where T : IEntityMessage {
 			var key = typeof(T);
 			onReceiveMessageCallbacks ??= new Dictionary<Type, ICallbacksWrapper>();
@@ -58,6 +79,7 @@ namespace EXRCore.EcsFramework {
 				onAddedCallback((T)component);
 			}
 		}
+		
 		public void RegisterHandler<T>(Action onRemovedCallback) where T : IEntityMessage {
 			var key = typeof(T);
 			onRemoveCallbacks ??= new Dictionary<Type, ICallbacksWrapper>();
@@ -70,6 +92,7 @@ namespace EXRCore.EcsFramework {
 			list.RegisterCallback(onRemovedCallback);
 			onRemoveCallbacks[key] = list;
 		}
+		#endregion
 		
 		#region Components
         public bool AddComponent<T>(T component) where T: IDynamicComponent {
@@ -116,7 +139,7 @@ namespace EXRCore.EcsFramework {
 		void IEntity.Update() => systems?.Update();
 		
 		void IEntity.OnDestroy() {
-			systems.Dispose();
+			systems?.Dispose();
 			if (onReceiveMessageCallbacks != null) {
 				foreach (var callbacksList in onReceiveMessageCallbacks.Values) {
 					callbacksList.Clear();

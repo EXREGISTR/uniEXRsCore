@@ -47,13 +47,15 @@
   <ItemGroup>
      <Compile Include="Assets\EXRCore\EcsFramework\System\IEcsSystem.cs" />
      <Compile Include="Assets\EXRCore\Services\IDisposableService.cs" />
+     <Compile Include="Assets\EXRCore\Services\Installers\IInstaller.cs" />
+     <Compile Include="Assets\EXRCore\Services\Installers\ScriptableInstaller.cs" />
      <Compile Include="Assets\EXRCore\Services\IService.cs" />
      <Compile Include="Assets\EXRCore\Services\IServiceContainer.cs" />
      <Compile Include="Assets\EXRCore\Services\ServiceContainer.cs" />
+     <Compile Include="Assets\EXRCore\Services\Installers\MonoInstaller.cs" />
+     <Compile Include="Assets\EXRCore\Services\Installers\ServiceContainerInstaller.cs" />
      <Compile Include="Assets\EXRCore\Services\Utils\Extenssions.cs" />
-     <Compile Include="Assets\EXRCore\Services\Utils\Installer.cs" />
      <Compile Include="Assets\EXRCore\Services\Utils\Service.cs" />
-     <Compile Include="Assets\EXRCore\Services\Utils\ServiceContainerInstaller.cs" />
      <Compile Include="Assets\EXRCore\Services\Wrappers\IServiceWrapper.cs" />
      <Compile Include="Assets\EXRCore\Services\Wrappers\ServiceWrapperBasedFactory.cs" />
      <Compile Include="Assets\EXRCore\Services\Wrappers\ServiceWrapperBasedInstance.cs" />
