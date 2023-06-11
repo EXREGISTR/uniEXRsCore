@@ -4,48 +4,51 @@ using EXRCore.Pools;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace EXRCore.EcsFramework {
+namespace EXRCore.Utils {
 	public sealed class Entity : IEntity, IPoolObject {
 		private readonly EcsComponentsProvider persistentComponents;
 		private readonly EcsSystemsProvider systems;
 		
-		private IDictionary<Type, IDynamicComponent> dynamicComponents;
-		private IDictionary<Type, ICallbacksWrapper> onReceiveMessageCallbacks;
-		private IDictionary<Type, ICallbacksWrapper> onRemoveCallbacks;
-		private IDictionary<Type, Component> cashedComponents;
-
+		private IDictionary<int, IDynamicComponent> dynamicComponents;
+		private IDictionary<int, ICallbacksWrapper> onReceiveMessageCallbacks;
+		private IDictionary<int, ICallbacksWrapper> onRemoveCallbacks;
+		private IDictionary<int, Component> cashedComponents;
+		
+		public int? OwnerFactoryIdentity { get; }
 		public GameObject Owner { get; }
 		public Transform Transform => Owner.transform;
 		public Vector3 Position => Transform.position;
 		public Quaternion Rotation => Transform.rotation;
-
-		public Entity(
+		public bool CreatedFromFactory => OwnerFactoryIdentity != null;
+		
+		internal Entity(
 			GameObject owner,
 			[CanBeNull] EcsComponentsProvider persistentComponents,
 			[CanBeNull] EcsSystemsProvider systems,
-			bool enableSystemsNow) {
-			
+			bool enableSystemsNow, int? ownerFactoryIdentity) {
+			persistentComponents ??= EcsComponentsProvider.Empty;
 			this.persistentComponents = persistentComponents;
 			this.systems = systems;
 			this.Owner = owner;
+			this.OwnerFactoryIdentity = ownerFactoryIdentity;
 			
 			systems?.Initialize(this, persistentComponents, enableSystemsNow);
 		}
 		
-		public void EnableSystem<T>() where T : IEcsSystem => systems.Enable<T>();
-		public void DisableSystem<T>() where T : IEcsSystem => systems.Disable<T>();
+		public void EnableSystem<T>() where T : IEcsSystem => systems?.Enable<T>();
+		public void DisableSystem<T>() where T : IEcsSystem => systems?.Disable<T>();
 
 		public T GetUnityComponent<T>() where T : Component {
-			var type = typeof(T);
-			if (cashedComponents != null && cashedComponents.TryGetValue(type, out var component)) {
+			var key = TypeHelper<T>.Identity;
+			if (cashedComponents != null && cashedComponents.TryGetValue(key, out var component)) {
 				return (T)component;
 			}
-			
+
 			component = Owner.GetComponent<T>();
 			if (component == null) return null;
 			
-			cashedComponents ??= new Dictionary<Type, Component>();
-			cashedComponents[type] = component;
+			cashedComponents ??= new Dictionary<int, Component>();
+			cashedComponents[key] = component;
 			return (T)component;
 		}
 		
@@ -54,35 +57,35 @@ namespace EXRCore.EcsFramework {
 			return component != null;
 		}
 		
-		#region Messages&Handlers
+		#region MessageHandlers
 		public void SendMessage<T>(T message) where T : IEntityMessage {
 			if (onReceiveMessageCallbacks == null) return;
-			var messageType = typeof(T);
-			
-			if (onReceiveMessageCallbacks.TryGetValue(messageType, out var callbacks)) {
+			var key = TypeHelper<T>.Identity;
+
+			if (onReceiveMessageCallbacks.TryGetValue(key, out var callbacks)) {
 				((OnReceivedMessagesCallbacks<T>)callbacks).Invoke(message);
 			}
 		}
 
-		public void RegisterHandler<T>(Action<T> onAddedCallback) where T : IEntityMessage {
-			var key = typeof(T);
-			onReceiveMessageCallbacks ??= new Dictionary<Type, ICallbacksWrapper>();
+		public void RegisterHandler<T>(Action<T> onReceivedMessage) where T : IEntityMessage {
+			var key = TypeHelper<T>.Identity;
+			onReceiveMessageCallbacks ??= new Dictionary<int, ICallbacksWrapper>();
 			if (!onReceiveMessageCallbacks.TryGetValue(key, out var callbacks)) {
 				var list = new OnReceivedMessagesCallbacks<T>();
-				list.RegisterCallback(onAddedCallback);
+				list.RegisterCallback(onReceivedMessage);
 				onReceiveMessageCallbacks[key] = list;
 			} else {
-				((OnReceivedMessagesCallbacks<T>)callbacks).RegisterCallback(onAddedCallback);
+				((OnReceivedMessagesCallbacks<T>)callbacks).RegisterCallback(onReceivedMessage);
 			}
 			
 			if (dynamicComponents.TryGetValue(key, out var component)) {
-				onAddedCallback((T)component);
+				onReceivedMessage((T)component);
 			}
 		}
 		
-		public void RegisterHandler<T>(Action onRemovedCallback) where T : IEntityMessage {
-			var key = typeof(T);
-			onRemoveCallbacks ??= new Dictionary<Type, ICallbacksWrapper>();
+		public void RegisterHandler<T>(Action onRemovedCallback) where T : IDynamicComponent {
+			var key = TypeHelper<T>.Identity;
+			onRemoveCallbacks ??= new Dictionary<int, ICallbacksWrapper>();
 			if (onRemoveCallbacks.TryGetValue(key, out var callbacks)) {
 				((OnRemovedComponentCallbackList)callbacks).RegisterCallback(onRemovedCallback);
 				return;
@@ -96,11 +99,11 @@ namespace EXRCore.EcsFramework {
 		
 		#region Components
         public bool AddComponent<T>(T component) where T: IDynamicComponent {
-        	var key = typeof(T);
+        	var key = TypeHelper<T>.Identity;
         	if (dynamicComponents != null) {
         	     if (dynamicComponents.ContainsKey(key)) return false;
         	} else {
-        		dynamicComponents = new Dictionary<Type, IDynamicComponent>();
+        		dynamicComponents = new Dictionary<int, IDynamicComponent>();
         	}
         	dynamicComponents[key] = component;
         	SendMessage(component);
@@ -108,7 +111,7 @@ namespace EXRCore.EcsFramework {
         }
         		
 		public bool RemoveComponent<T>() where T : IDynamicComponent { 
-			var key = typeof(T);
+			var key = TypeHelper<T>.Identity;
 			if (dynamicComponents == null) return false;
         
 			var result = dynamicComponents.Remove(key);
@@ -128,13 +131,13 @@ namespace EXRCore.EcsFramework {
         }
         
 		public bool ContainsDynamicComponent<T>() where T: IDynamicComponent {
-			return dynamicComponents != null && dynamicComponents.ContainsKey(typeof(T));
+			return dynamicComponents != null && dynamicComponents.ContainsKey(TypeHelper<T>.Identity);
 		}
 		#endregion
                 
 		#region Explicitly
-		void IEntity.OnEnable() => systems.EnableAll();
-		void IEntity.OnDisable() => systems.DisableAll();
+		void IEntity.OnEnable() => systems?.EnableAll();
+		void IEntity.OnDisable() => systems?.DisableAll();
 		void IEntity.FixedUpdate() => systems?.FixedUpdate();
 		void IEntity.Update() => systems?.Update();
 		

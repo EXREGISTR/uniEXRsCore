@@ -1,14 +1,19 @@
-﻿namespace EXRCore.EcsFramework {
+﻿namespace EXRCore.Utils {
 	public abstract class EcsSystem : IEcsSystem {
+		public bool EnableAfterInitialize { get; }
+		
 		protected Entity context { get; private set; }
 		protected bool isActive { get; private set; }
 		
-		void IEcsSystem.Initialize(Entity context, EcsProvider<IPersistentComponent> components) {
+		protected EcsSystem() => EnableAfterInitialize = true;
+		protected EcsSystem(bool enableAfterInitialize) => EnableAfterInitialize = enableAfterInitialize;
+		
+		void IEcsSystem.Initialize(Entity context, EcsProvider<IPersistentComponent> components, EcsProvider<IEcsSystem> systems) {
 			this.context = context;
-			if (components != null) Initialize(components);
+			Initialize(components, systems);
 		}
 		
-		protected abstract void Initialize(EcsProvider<IPersistentComponent> components);
+		protected abstract void Initialize(EcsProvider<IPersistentComponent> components, EcsProvider<IEcsSystem> systems);
 		
 		void IEcsSystem.OnDestroy() => OnDestroy();
 

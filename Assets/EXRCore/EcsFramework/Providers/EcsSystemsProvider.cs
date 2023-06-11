@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
-namespace EXRCore.EcsFramework {
+namespace EXRCore.Utils {
 	public class EcsSystemsProvider : EcsProvider<IEcsSystem>, IDisposable {
-		public EcsSystemsProvider(IReadOnlyDictionary<Type, Func<IEcsSystem>> systems) : base(systems) { }
-		public EcsSystemsProvider(IDictionary<Type, IEcsSystem> systems) : base(systems) { }
-
-		public void Initialize(Entity context, [CanBeNull] EcsProvider<IPersistentComponent> components, bool enableSystemsNow) {
+		public EcsSystemsProvider(IReadOnlyDictionary<int, Func<IEcsSystem>> systems) : base(systems) { }
+		public EcsSystemsProvider(IDictionary<int, IEcsSystem> systems) : base(systems) { }
+		
+		public void Initialize(Entity context, EcsProvider<IPersistentComponent> components, bool enableSystemsNow) {
 			Action<IEcsSystem> action;
 			if (enableSystemsNow) {
 				action = system => {
-					system.Initialize(context, components);
-					system.Enable();
+					system.Initialize(context, components, this);
+					if (system.EnableAfterInitialize) system.Enable();
 				};
 			}
 			else {
-				action = system => system.Initialize(context, components);
+				action = system => system.Initialize(context, components, this);
 			}
 
 			ExecuteForAll(action);

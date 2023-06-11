@@ -1,8 +1,7 @@
-﻿using JetBrains.Annotations;
-
-namespace EXRCore.EcsFramework {
+﻿namespace EXRCore.Utils {
 	public interface IEcsSystem : IEcsSubject {
-		internal void Initialize(Entity context, [CanBeNull] EcsProvider<IPersistentComponent> components);
+		public bool EnableAfterInitialize { get; }
+		internal void Initialize(Entity context, EcsProvider<IPersistentComponent> components, EcsProvider<IEcsSystem> systems);
 		internal void FixedUpdate();
 		internal void Update();
 		internal void OnDestroy();
