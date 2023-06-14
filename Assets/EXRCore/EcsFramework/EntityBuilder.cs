@@ -2,7 +2,7 @@
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace EXRCore.Utils {
+namespace EXRCore.EcsFramework {
 	public sealed class EntityBuilder {
 		private readonly GameObject prefab;
 		
@@ -18,7 +18,7 @@ namespace EXRCore.Utils {
 		public EntityBuilder AddComponent<T>(T component) where T : class, IPersistentComponent => RegisterSubject(ref components, component);
 		public EntityBuilder AddSystem<T>(T system) where T : class, IEcsSystem => RegisterSubject(ref systems, system);
 		
-		private EntityBuilder RegisterSubject<T>(ref IDictionary<int, T> target, T subject) where T : class, IEcsSubject {
+		private EntityBuilder RegisterSubject<T>(ref IDictionary<int, T> target, T subject) where T : class {
 			var key = TypeHelper<T>.Identity;
 			
 			target ??= new Dictionary<int, T>();

@@ -5,7 +5,7 @@ using EXRCore.Services;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace EXRCore.Utils {
+namespace EXRCore.EcsFramework {
 	public sealed class EcsWorld : IService {
 		private readonly Dictionary<int, IEntity> spawnedEntitiesByObject = new();
 		private static IReadOnlyDictionary<int, EntityFactory> entityFactories;
@@ -41,7 +41,7 @@ namespace EXRCore.Utils {
 			}
 
 			if (!TryGetFactory(configType.GetHashCode(), out factory)) {
-				Debug.LogError("");
+				Debug.LogError($"Factory of type {configType} doesn't registered!");
 				return false;
 			}
 			
@@ -50,30 +50,18 @@ namespace EXRCore.Utils {
 		
 		public Entity CreateEntity(GameObject owner, EcsComponentsProvider components = null, EcsSystemsProvider systems = null, 
 			bool enableSystemsByDefault = true, int? factoryIdentity = null) {
-			var entity = new Entity(owner, components, systems, enableSystemsByDefault, factoryIdentity);
 			var key = owner.GetHashCode();
 			if (spawnedEntitiesByObject.ContainsKey(key)) { 
 				throw new InvalidOperationException($"Entity for game object {owner} already exists!");
 			}
 			
+			var entity = new Entity(owner, components, systems, enableSystemsByDefault, factoryIdentity);
 			spawnedEntitiesByObject[key] = entity;
 			return entity;
 		}
 		
 		public bool TryGetEntity(GameObject other, out IEntity entity) => spawnedEntitiesByObject.TryGetValue(other.GetHashCode(), out entity);
 
-		public void Update() {
-			foreach (var entity in spawnedEntitiesByObject.Values) {
-				entity.Update();
-			}
-		}
-		
-		public void FixedUpdate() {
-			foreach (var entity in spawnedEntitiesByObject.Values) {
-				entity.FixedUpdate();
-			}
-		}
-		
 		public Entity GetFromPool<TPool>() where TPool: PoolProvider<Entity> {
 			var entity = Service<PoolService>.Instance.Get<TPool, Entity>();
 			((IEntity)entity).OnEnable();

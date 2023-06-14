@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace EXRCore.Utils {
+namespace EXRCore.EcsFramework {
 	public interface IEntity {
 		public GameObject Owner { get; }
 		
@@ -9,8 +9,6 @@ namespace EXRCore.Utils {
 		public void SendMessage<T>(T message) where T : IEntityMessage;
 		public bool AddComponent<T>(T component) where T : IDynamicComponent;
 		public bool RemoveComponent<T>() where T : IDynamicComponent;
-		internal void FixedUpdate();
-		internal void Update();
 		internal void OnDestroy();
 		internal void OnEnable();
 		internal void OnDisable();

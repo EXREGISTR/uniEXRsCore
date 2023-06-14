@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EXRCore.Utils {
+namespace EXRCore.EcsFramework {
 	public static class EntityExtenssions {
 		public static void RegisterHandler<T>(this Entity entity, Action<T> onAddCallback, Action onRemoveCallback)
 			where T : IDynamicComponent {

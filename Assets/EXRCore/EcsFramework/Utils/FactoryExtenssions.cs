@@ -1,5 +1,5 @@
-﻿namespace EXRCore.Utils {
-	public static class ConfigExtenssions {
+﻿namespace EXRCore.EcsFramework {
+	public static class FactoryExtenssions {
 		public static void RegisterComponent<T>(this EntityFactory factory) where T : class, IPersistentComponent, new() {
 			factory.RegisterComponent(() => new T());
 		}

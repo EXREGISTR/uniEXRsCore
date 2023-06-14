@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EXRCore.Utils {
+namespace EXRCore.EcsFramework {
 	public static class ListsExtenssions {
 		private static readonly Random random = new();
 		

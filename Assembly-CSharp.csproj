@@ -45,10 +45,17 @@
     <Analyzer Include="F:\Unity\2022.2.1f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\EXRCore\EcsFramework\System\IEcsSystem.cs" />
-     <Compile Include="Assets\EXRCore\EcsFramework\Utils\ConfigExtenssions.cs" />
+     <Compile Include="Assets\EXRCore\EcsFramework\Systems\EcsFixedUpdatableSystem.cs" />
+     <Compile Include="Assets\EXRCore\EcsFramework\Systems\EcsFullUpdatableSystem.cs" />
+     <Compile Include="Assets\EXRCore\EcsFramework\Systems\EcsUpdatableSystem.cs" />
+     <Compile Include="Assets\EXRCore\EcsFramework\Systems\IEcsSystem.cs" />
+     <Compile Include="Assets\EXRCore\EcsFramework\Utils\FactoryExtenssions.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Utils\EntityExtenssions.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Utils\WorldExtenssions.cs" />
+     <Compile Include="Assets\EXRCore\Observers\GameDispatcher.cs" />
+     <Compile Include="Assets\EXRCore\Observers\IFixedUpdatable.cs" />
+     <Compile Include="Assets\EXRCore\Observers\IUpdatable.cs" />
+     <Compile Include="Assets\EXRCore\Observers\Timer.cs" />
      <Compile Include="Assets\EXRCore\Services\IDisposableService.cs" />
      <Compile Include="Assets\EXRCore\Services\Installers\IInstaller.cs" />
      <Compile Include="Assets\EXRCore\Services\Installers\ScriptableInstaller.cs" />
@@ -73,7 +80,7 @@
      <Compile Include="Assets\EXRCore\Attributes\ReadOnlyDrawer.cs" />
      <Compile Include="Assets\EXRCore\Attributes\ReadOnlyAttribute.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\ViewHandler\IViewHandler.cs" />
-     <Compile Include="Assets\EXRCore\EcsFramework\System\EcsSystem.cs" />
+     <Compile Include="Assets\EXRCore\EcsFramework\Systems\EcsSystem.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\IEntityMessage.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\EntityFactory.cs" />
      <Compile Include="Assets\EXRCore\Utils\ListsExtenssions.cs" />
@@ -84,7 +91,7 @@
      <Compile Include="Assets\EXRCore\EventBus\IMessage.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\Screen\IScreen.cs" />
      <Compile Include="Assets\EXRCore\EventBus\IEventHandlersList.cs" />
-     <Compile Include="Assets\EXRCore\EcsFramework\Component\IPersistentComponent.cs" />
+     <Compile Include="Assets\EXRCore\EcsFramework\Components\IPersistentComponent.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\ViewHandler\IOneTimeHandler.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\EntityBuilder.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\IUIService.cs" />
@@ -96,18 +103,17 @@
      <Compile Include="Assets\EXRCore\Pools\Pool.cs" />
      <Compile Include="Assets\EXRCore\Pools\PoolService.cs" />
      <Compile Include="Assets\EXRCore\EventBus\EventBus.cs" />
-     <Compile Include="Assets\EXRCore\EcsFramework\IEcsSubject.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Providers\EcsComponentsProvider.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Providers\EcsProvider.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Utils\CallbacksWrapper.cs" />
-     <Compile Include="Assets\EXRCore\EcsFramework\Component\IDynamicComponent.cs" />
+     <Compile Include="Assets\EXRCore\EcsFramework\Components\IDynamicComponent.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\UIService.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Providers\EcsSystemsProvider.cs" />
-     <Compile Include="Assets\EXRCore\EcsFramework\Component\IEntityComponent.cs" />
+     <Compile Include="Assets\EXRCore\EcsFramework\Components\IEntityComponent.cs" />
      <Folder Include="Assets" />
      <Folder Include="Assets\EXRCore\UIFramework\Screen" />
      <Folder Include="Assets\EXRCore\UIFramework\Tools" />
-     <Folder Include="Assets\EXRCore\EcsFramework\Component" />
+     <Folder Include="Assets\EXRCore\EcsFramework\Components" />
      <Folder Include="Assets\Scenes" />
      <Folder Include="Assets\TutorialInfo" />
      <Folder Include="Assets\EXRCore\UIFramework\ViewHandler" />
@@ -115,7 +121,6 @@
      <Folder Include="Assets\EXRCore\Attributes" />
      <Folder Include="Assets\EXRCore\Pools" />
      <Folder Include="Assets\EXRCore\EcsFramework\Providers" />
-     <Folder Include="Assets\EXRCore\EcsFramework\System" />
      <Folder Include="Assets\TutorialInfo\Scripts" />
      <Folder Include="Assets\TutorialInfo\Icons" />
      <Folder Include="Assets\EXRCore\UIFramework" />

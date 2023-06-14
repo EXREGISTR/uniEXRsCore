@@ -4,7 +4,7 @@ using EXRCore.Pools;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace EXRCore.Utils {
+namespace EXRCore.EcsFramework {
 	public static class WorldExtenssions {
 		public static bool TryAddComponent<T>(this EcsWorld world, T component, GameObject target) where T : IDynamicComponent {
 			return world.TryGetEntity(target, out var entity) && entity.AddComponent(component);

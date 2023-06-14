@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EXRCore.Utils {
+namespace EXRCore.EcsFramework {
 	public class EcsComponentsProvider : EcsProvider<IPersistentComponent> {
 		public static EcsComponentsProvider Empty => new();
 		

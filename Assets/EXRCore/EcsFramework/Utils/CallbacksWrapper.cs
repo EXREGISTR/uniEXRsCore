@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace EXRCore.Utils {
+namespace EXRCore.EcsFramework {
 	internal interface ICallbacksWrapper {
 		public void Clear();
 	}

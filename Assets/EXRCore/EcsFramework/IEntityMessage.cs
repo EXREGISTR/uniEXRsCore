@@ -1,3 +1,3 @@
-﻿namespace EXRCore.Utils {
+﻿namespace EXRCore.EcsFramework {
 	public interface IEntityMessage { }
 }

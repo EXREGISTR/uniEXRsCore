@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using EXRCore.Pools;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace EXRCore.Utils {
+namespace EXRCore.EcsFramework {
 	public sealed class Entity : IEntity, IPoolObject {
 		private readonly EcsComponentsProvider persistentComponents;
 		private readonly EcsSystemsProvider systems;
+		private readonly CancellationTokenSource cts;
 		
 		private IDictionary<int, IDynamicComponent> dynamicComponents;
 		private IDictionary<int, ICallbacksWrapper> onReceiveMessageCallbacks;
@@ -19,24 +21,26 @@ namespace EXRCore.Utils {
 		public Transform Transform => Owner.transform;
 		public Vector3 Position => Transform.position;
 		public Quaternion Rotation => Transform.rotation;
-		public bool CreatedFromFactory => OwnerFactoryIdentity != null;
+		public bool IsCreatedByFactory => OwnerFactoryIdentity != null;
+		public CancellationToken DestroyToken => cts.Token;
 		
 		internal Entity(
 			GameObject owner,
 			[CanBeNull] EcsComponentsProvider persistentComponents,
 			[CanBeNull] EcsSystemsProvider systems,
-			bool enableSystemsNow, int? ownerFactoryIdentity) {
+			in bool enableSystemsNow, int? ownerFactoryIdentity) {
 			persistentComponents ??= EcsComponentsProvider.Empty;
 			this.persistentComponents = persistentComponents;
 			this.systems = systems;
 			this.Owner = owner;
 			this.OwnerFactoryIdentity = ownerFactoryIdentity;
+			this.cts = new CancellationTokenSource();
 			
 			systems?.Initialize(this, persistentComponents, enableSystemsNow);
 		}
-		
-		public void EnableSystem<T>() where T : IEcsSystem => systems?.Enable<T>();
-		public void DisableSystem<T>() where T : IEcsSystem => systems?.Disable<T>();
+
+		public void EnableSystem<T>() where T : class, IEcsSystem => systems?.Enable<T>();
+		public void DisableSystem<T>() where T : class, IEcsSystem => systems?.Disable<T>();
 
 		public T GetUnityComponent<T>() where T : Component {
 			var key = TypeHelper<T>.Identity;
@@ -138,10 +142,9 @@ namespace EXRCore.Utils {
 		#region Explicitly
 		void IEntity.OnEnable() => systems?.EnableAll();
 		void IEntity.OnDisable() => systems?.DisableAll();
-		void IEntity.FixedUpdate() => systems?.FixedUpdate();
-		void IEntity.Update() => systems?.Update();
 		
 		void IEntity.OnDestroy() {
+			cts.Cancel();
 			systems?.Dispose();
 			if (onReceiveMessageCallbacks != null) {
 				foreach (var callbacksList in onReceiveMessageCallbacks.Values) {
