@@ -109,7 +109,6 @@
      <Compile Include="Assets\EXRCore\EcsFramework\Components\IDynamicComponent.cs" />
      <Compile Include="Assets\EXRCore\UIFramework\UIService.cs" />
      <Compile Include="Assets\EXRCore\EcsFramework\Providers\EcsSystemsProvider.cs" />
-     <Compile Include="Assets\EXRCore\EcsFramework\Components\IEntityComponent.cs" />
      <Folder Include="Assets" />
      <Folder Include="Assets\EXRCore\UIFramework\Screen" />
      <Folder Include="Assets\EXRCore\UIFramework\Tools" />
