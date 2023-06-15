@@ -9,32 +9,40 @@ namespace EXRCore.EcsFramework {
 	public sealed class Entity : IEntity, IPoolObject {
 		private readonly EcsComponentsProvider persistentComponents;
 		private readonly EcsSystemsProvider systems;
-		private readonly CancellationTokenSource cts;
+		
+		private CancellationTokenSource destroyCancellationTokenSource;
 		
 		private IDictionary<int, IDynamicComponent> dynamicComponents;
 		private IDictionary<int, ICallbacksWrapper> onReceiveMessageCallbacks;
 		private IDictionary<int, ICallbacksWrapper> onRemoveCallbacks;
 		private IDictionary<int, Component> cashedComponents;
-		
+
 		public int? OwnerFactoryIdentity { get; }
 		public GameObject Owner { get; }
 		public Transform Transform => Owner.transform;
 		public Vector3 Position => Transform.position;
 		public Quaternion Rotation => Transform.rotation;
 		public bool IsCreatedByFactory => OwnerFactoryIdentity != null;
-		public CancellationToken DestroyToken => cts.Token;
+		
+		public CancellationToken DestroyToken {
+			get {
+				destroyCancellationTokenSource ??= new CancellationTokenSource();
+				return destroyCancellationTokenSource.Token;
+			}
+		}
 		
 		internal Entity(
 			GameObject owner,
 			[CanBeNull] EcsComponentsProvider persistentComponents,
 			[CanBeNull] EcsSystemsProvider systems,
-			in bool enableSystemsNow, int? ownerFactoryIdentity) {
+			in bool enableSystemsNow,
+			int? ownerFactoryIdentity) {
+			
 			persistentComponents ??= EcsComponentsProvider.Empty;
 			this.persistentComponents = persistentComponents;
 			this.systems = systems;
 			this.Owner = owner;
 			this.OwnerFactoryIdentity = ownerFactoryIdentity;
-			this.cts = new CancellationTokenSource();
 			
 			systems?.Initialize(this, persistentComponents, enableSystemsNow);
 		}
@@ -67,7 +75,7 @@ namespace EXRCore.EcsFramework {
 			var key = TypeHelper<T>.Identity;
 
 			if (onReceiveMessageCallbacks.TryGetValue(key, out var callbacks)) {
-				((OnReceivedMessagesCallbacks<T>)callbacks).Invoke(message);
+				((OnReceivedMessageCallbacks<T>)callbacks).Invoke(message);
 			}
 		}
 
@@ -75,11 +83,11 @@ namespace EXRCore.EcsFramework {
 			var key = TypeHelper<T>.Identity;
 			onReceiveMessageCallbacks ??= new Dictionary<int, ICallbacksWrapper>();
 			if (!onReceiveMessageCallbacks.TryGetValue(key, out var callbacks)) {
-				var list = new OnReceivedMessagesCallbacks<T>();
+				var list = new OnReceivedMessageCallbacks<T>();
 				list.RegisterCallback(onReceivedMessage);
 				onReceiveMessageCallbacks[key] = list;
 			} else {
-				((OnReceivedMessagesCallbacks<T>)callbacks).RegisterCallback(onReceivedMessage);
+				((OnReceivedMessageCallbacks<T>)callbacks).RegisterCallback(onReceivedMessage);
 			}
 			
 			if (dynamicComponents.TryGetValue(key, out var component)) {
@@ -144,7 +152,7 @@ namespace EXRCore.EcsFramework {
 		void IEntity.OnDisable() => systems?.DisableAll();
 		
 		void IEntity.OnDestroy() {
-			cts.Cancel();
+			destroyCancellationTokenSource.Cancel();
 			systems?.Dispose();
 			if (onReceiveMessageCallbacks != null) {
 				foreach (var callbacksList in onReceiveMessageCallbacks.Values) {
@@ -199,7 +207,7 @@ namespace EXRCore.EcsFramework {
 			if (obj is not Entity other) return false;
 			return GetHashCode() == other.GetHashCode();
 		}
-
+		
 		public override int GetHashCode() => Owner.GetHashCode();
 		public override string ToString() => $"Entity {Owner.name}";
 	}

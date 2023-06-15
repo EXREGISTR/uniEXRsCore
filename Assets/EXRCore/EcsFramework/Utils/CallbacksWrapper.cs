@@ -7,7 +7,7 @@ namespace EXRCore.EcsFramework {
 		public void Clear();
 	}
 	
-	internal class OnReceivedMessagesCallbacks<T> : ICallbacksWrapper where T: IEntityMessage {
+	internal class OnReceivedMessageCallbacks<T> : ICallbacksWrapper where T: IEntityMessage {
 		private Action<T> callbacks;
 
 		public void RegisterCallback(Action<T> callback) => callbacks += callback;

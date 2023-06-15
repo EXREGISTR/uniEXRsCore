@@ -18,7 +18,7 @@ namespace EXRCore.EcsFramework {
 		public EntityBuilder AddComponent<T>(T component) where T : class, IPersistentComponent => RegisterSubject(ref components, component);
 		public EntityBuilder AddSystem<T>(T system) where T : class, IEcsSystem => RegisterSubject(ref systems, system);
 		
-		private EntityBuilder RegisterSubject<T>(ref IDictionary<int, T> target, T subject) where T : class {
+		private EntityBuilder RegisterSubject<T>(ref IDictionary<int, T> target, in T subject) where T : class {
 			var key = TypeHelper<T>.Identity;
 			
 			target ??= new Dictionary<int, T>();

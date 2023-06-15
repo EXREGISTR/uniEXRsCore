@@ -6,11 +6,15 @@
 		protected EcsSystem() => enableOnInitialize = true;
 		protected EcsSystem(in bool enable) => enableOnInitialize = enable;
 		
-		void IEcsSystem.Initialize(Entity context, EcsProvider<IPersistentComponent> components, 
-			EcsProvider<IEcsSystem> systems, in bool enableSystems) {
+		void IEcsSystem.Initialize(Entity context, EcsProvider<IPersistentComponent> components, EcsProvider<IEcsSystem> systems) {
 			this.context = context;
 			Initialize(components, systems);
-			if (enableSystems && enableOnInitialize) Enable();
+		}
+		
+		void IEcsSystem.InitializeAndEnable(Entity context, EcsProvider<IPersistentComponent> components, EcsProvider<IEcsSystem> systems) {
+			this.context = context;
+			Initialize(components, systems);
+			if (enableOnInitialize) Enable();
 		}
 		
 		protected abstract void Initialize(in EcsProvider<IPersistentComponent> components, in EcsProvider<IEcsSystem> systems);
